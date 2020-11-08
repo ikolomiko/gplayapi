@@ -20,7 +20,7 @@ import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.sale.SaleBundle
-import com.aurora.gplayapi.network.HttpClient
+import com.aurora.gplayapi.network.IHttpClient
 import com.google.gson.Gson
 import java.io.IOException
 import java.util.*
@@ -28,6 +28,10 @@ import java.util.*
 class AppSalesHelper private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<AppSalesHelper, AuthData>(::AppSalesHelper)
+
+    override fun using(httpClient: IHttpClient) = apply {
+        this.httpClient = httpClient
+    }
 
     @Throws(IOException::class)
     fun getAppsOnSale(page: Int, offer: Int = 100, type: String = ""): List<App> {
@@ -39,7 +43,7 @@ class AppSalesHelper private constructor(authData: AuthData) : BaseHelper(authDa
 
         /*params["typefilter"] = type Not sure of values */
 
-        val playResponse = HttpClient.get(GooglePlayApi.SALES_URL, headers = mapOf(), params)
+        val playResponse = httpClient.get(GooglePlayApi.SALES_URL, headers = mapOf(), params)
         val saleBundle = Gson().fromJson(String(playResponse.responseBytes), SaleBundle::class.java)
 
         return if (saleBundle.sales.isEmpty())

@@ -22,7 +22,7 @@ import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.exceptions.ApiException
-import com.aurora.gplayapi.network.HttpClient
+import com.aurora.gplayapi.network.IHttpClient
 import okhttp3.MediaType
 import okhttp3.Request
 import okhttp3.RequestBody
@@ -32,13 +32,17 @@ class AppDetailsHelper private constructor(authData: AuthData) : BaseHelper(auth
 
     companion object : SingletonHolder<AppDetailsHelper, AuthData>(::AppDetailsHelper)
 
+    override fun using(httpClient: IHttpClient) = apply {
+        this.httpClient = httpClient
+    }
+
     @Throws(Exception::class)
     fun getAppByPackageName(packageName: String): App? {
         val headers: Map<String, String> = getDefaultHeaders(authData)
         val params: MutableMap<String, String> = HashMap()
         params["doc"] = packageName
 
-        val playResponse = HttpClient.get(GooglePlayApi.URL_DETAILS, headers, params)
+        val playResponse = httpClient.get(GooglePlayApi.URL_DETAILS, headers, params)
 
         if (playResponse.isSuccessful) {
             val detailsResponse = getDetailsResponseFromBytes(playResponse.responseBytes)
@@ -63,7 +67,7 @@ class AppDetailsHelper private constructor(authData: AuthData) : BaseHelper(auth
                 .post(RequestBody.create(MediaType.parse("application/x-protobuf"), request))
 
         val playResponse = requestBuilder.build().body()?.let {
-            HttpClient.post(GooglePlayApi.URL_BULK_DETAILS, headers, it)
+            httpClient.post(GooglePlayApi.URL_BULK_DETAILS, headers, it)
         }
 
         if (playResponse != null) {

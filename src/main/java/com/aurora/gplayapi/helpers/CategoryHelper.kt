@@ -22,12 +22,16 @@ import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.Category
 import com.aurora.gplayapi.data.models.subcategory.SubCategoryBundle
 import com.aurora.gplayapi.data.providers.HeaderProvider
-import com.aurora.gplayapi.network.HttpClient
+import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
 
 class CategoryHelper private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<CategoryHelper, AuthData>(::CategoryHelper)
+
+    override fun using(httpClient: IHttpClient) = apply {
+        this.httpClient = httpClient
+    }
 
     @Throws(Exception::class)
     fun getAllCategoriesList(type: Category.Type): List<Category> {
@@ -37,7 +41,7 @@ class CategoryHelper private constructor(authData: AuthData) : BaseHelper(authDa
         params["c"] = "3"
         params["cat"] = type.value
 
-        val playResponse = HttpClient.get(GooglePlayApi.CATEGORIES_URL, headers, params)
+        val playResponse = httpClient.get(GooglePlayApi.CATEGORIES_URL, headers, params)
         val listResponse = getListResponseFromBytes(playResponse.responseBytes)
 
         if (listResponse!!.itemCount > 0) {
@@ -57,7 +61,7 @@ class CategoryHelper private constructor(authData: AuthData) : BaseHelper(authDa
     @Throws(Exception::class)
     fun getSubCategoryCluster(homeUrl: String): SubCategoryBundle? {
         val headers = HeaderProvider.getDefaultHeaders(authData)
-        val playResponse = HttpClient.get(GooglePlayApi.URL_FDFE + "/" + homeUrl, headers)
+        val playResponse = httpClient.get(GooglePlayApi.URL_FDFE + "/" + homeUrl, headers)
         return getSubCategoryCluster(playResponse.responseBytes)
     }
 

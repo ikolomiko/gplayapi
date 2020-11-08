@@ -22,7 +22,8 @@ import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.data.providers.ParamProvider.getAuthParams
 import com.aurora.gplayapi.data.providers.ParamProvider.getDefaultAuthParams
 import com.aurora.gplayapi.exceptions.AuthException
-import com.aurora.gplayapi.network.HttpClient
+import com.aurora.gplayapi.network.DefaultHttpClient
+import com.aurora.gplayapi.network.IHttpClient
 import com.aurora.gplayapi.utils.Util
 import okhttp3.MediaType
 import okhttp3.Request
@@ -33,9 +34,15 @@ import java.util.*
 
 class GooglePlayApi(private val authData: AuthData) {
 
+    private var httpClient: IHttpClient = DefaultHttpClient
+
+    fun via(httpClient: IHttpClient) = apply {
+        this.httpClient = httpClient
+    }
+
     @Throws(IOException::class)
     fun toc(): TocResponse {
-        val playResponse = HttpClient.get(URL_TOC, getDefaultHeaders(authData))
+        val playResponse = httpClient.get(URL_TOC, getDefaultHeaders(authData))
         val tocResponse = ResponseWrapper.parseFrom(playResponse.responseBytes).payload.tocResponse
         if (tocResponse.tosContent.isNotBlank() && tocResponse.tosToken.isNotBlank()) {
             acceptTos(tocResponse.tosToken)
@@ -53,7 +60,7 @@ class GooglePlayApi(private val authData: AuthData) {
         params["tost"] = tosToken
         params["toscme"] = "false"
 
-        val playResponse = HttpClient.post(URL_TOS_ACCEPT, headers, params)
+        val playResponse = httpClient.post(URL_TOS_ACCEPT, headers, params)
         return ResponseWrapper.parseFrom(playResponse.responseBytes)
                 .payload
                 .acceptTosResponse
@@ -66,17 +73,13 @@ class GooglePlayApi(private val authData: AuthData) {
                 .build()
 
         val headers: MutableMap<String, String> = getDefaultHeaders(authData)
-        headers["X-DFE-Enabled-Experiments"] = "cl:billing.select_add_instrument_by_default"
-        headers["X-DFE-Unsupported-Experiments"] = "nocache:billing.use_charging_poller,market_emails,buyer_currency,prod_baseline,checkin.set_asset_paid_app_field,shekel_test,content_ratings,buyer_currency_in_app,nocache:encrypted_apk,recent_changes"
-        headers["X-DFE-SmallestScreenWidthDp"] = "320"
-        headers["X-DFE-Filter-Level"] = "3"
 
         val requestBuilder = Request.Builder()
                 .url(URL_UPLOAD_DEVICE_CONFIG)
                 .post(RequestBody.create(MediaType.parse("application/x-protobuf"), request.toByteArray()))
 
         val playResponse = requestBuilder.build().body()?.let {
-            HttpClient.post(URL_UPLOAD_DEVICE_CONFIG, headers, it)
+            httpClient.post(URL_UPLOAD_DEVICE_CONFIG, headers, it)
         }
 
         val configResponse = ResponseWrapper.parseFrom(playResponse?.responseBytes)
@@ -108,7 +111,7 @@ class GooglePlayApi(private val authData: AuthData) {
                 .url(URL_CHECK_IN)
                 .post(RequestBody.create(MediaType.parse("application/x-protobuf"), request))
         val responseBody = requestBuilder.build().body()?.let {
-            HttpClient.post(URL_CHECK_IN, headers, it)
+            httpClient.post(URL_CHECK_IN, headers, it)
         }
         return AndroidCheckinResponse.parseFrom(responseBody?.responseBytes)
     }
@@ -120,12 +123,12 @@ class GooglePlayApi(private val authData: AuthData) {
         params.putAll(getAASTokenHeaders(email, oauthToken))
         val headers: MutableMap<String, String> = getAuthHeaders(authData)
         headers["app"] = "com.android.vending"
-        val playResponse = HttpClient.post(URL_AUTH, headers, params)
+        val playResponse = httpClient.post(URL_AUTH, headers, params)
         val hashMap = Util.parseResponse(playResponse.responseBytes)
         return if (hashMap.containsKey("Token")) {
             hashMap["Token"]
         } else {
-            throw AuthException("Authentication failed")
+            throw AuthException("Authentication failed : Could not generate AAS Token")
         }
     }
 
@@ -170,7 +173,7 @@ class GooglePlayApi(private val authData: AuthData) {
             }
         }
 
-        val playResponse = HttpClient.post(URL_AUTH, headers, params)
+        val playResponse = httpClient.post(URL_AUTH, headers, params)
         val hashMap = Util.parseResponse(playResponse.responseBytes)
 
         return if (hashMap.containsKey("Auth")) {
@@ -178,7 +181,7 @@ class GooglePlayApi(private val authData: AuthData) {
             authData.authToken = token!!
             token
         } else {
-            throw AuthException("Authentication failed")
+            throw AuthException("Authentication failed : Could not generate OAuth Token")
         }
     }
 

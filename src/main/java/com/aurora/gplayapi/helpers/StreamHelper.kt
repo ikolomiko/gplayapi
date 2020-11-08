@@ -22,12 +22,16 @@ import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.StreamBundle
 import com.aurora.gplayapi.data.models.editor.EditorChoiceBundle
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
-import com.aurora.gplayapi.network.HttpClient
+import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
 
 class StreamHelper private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<StreamHelper, AuthData>(::StreamHelper)
+
+    override fun using(httpClient: IHttpClient) = apply {
+        this.httpClient = httpClient
+    }
 
     @Throws(Exception::class)
     fun getNavStream(type: Type, category: Category): StreamBundle {
@@ -59,7 +63,7 @@ class StreamHelper private constructor(authData: AuthData) : BaseHelper(authData
                 params["cat"] = category.value
         }
 
-        val playResponse = HttpClient.get(GooglePlayApi.URL_FDFE + "/" + type.value, headers, params)
+        val playResponse = httpClient.get(GooglePlayApi.URL_FDFE + "/" + type.value, headers, params)
 
         return if (playResponse.isSuccessful)
             getListResponseFromBytes(playResponse.responseBytes)

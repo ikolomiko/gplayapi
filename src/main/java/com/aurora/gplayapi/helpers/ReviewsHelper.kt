@@ -23,7 +23,7 @@ import com.aurora.gplayapi.data.builders.ReviewBuilder.build
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.Review
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
-import com.aurora.gplayapi.network.HttpClient
+import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
 
 class ReviewsHelper private constructor(authData: AuthData) : BaseHelper(authData) {
@@ -31,6 +31,10 @@ class ReviewsHelper private constructor(authData: AuthData) : BaseHelper(authDat
     companion object : SingletonHolder<ReviewsHelper, AuthData>(::ReviewsHelper) {
         const val DEFAULT_SIZE = 20
         var OFFSET = 0
+    }
+
+    override fun using(httpClient: IHttpClient) = apply {
+        this.httpClient = httpClient
     }
 
     @Throws(Exception::class)
@@ -42,7 +46,7 @@ class ReviewsHelper private constructor(authData: AuthData) : BaseHelper(authDat
 
     @Throws(Exception::class)
     private fun postReviewResponse(params: Map<String, String>, headers: Map<String, String>): ReviewResponse? {
-        val playResponse = HttpClient.post(GooglePlayApi.URL_REVIEW_ADD_EDIT, headers, params)
+        val playResponse = httpClient.post(GooglePlayApi.URL_REVIEW_ADD_EDIT, headers, params)
         val payload = getPayLoadFromBytes(playResponse.responseBytes)
         return if (payload.hasReviewResponse()) payload.reviewResponse else null
     }

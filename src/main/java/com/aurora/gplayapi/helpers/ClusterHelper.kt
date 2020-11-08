@@ -20,12 +20,16 @@ import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.StreamCluster
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
-import com.aurora.gplayapi.network.HttpClient
+import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
 
 class ClusterHelper private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<ClusterHelper, AuthData>(::ClusterHelper)
+
+    override fun using(httpClient: IHttpClient) = apply {
+        this.httpClient = httpClient
+    }
 
     @Throws(Exception::class)
     fun next(nextPageUrl: String): StreamCluster {
@@ -40,7 +44,7 @@ class ClusterHelper private constructor(authData: AuthData) : BaseHelper(authDat
         params["n"] = "15"
         params["tab"] = type.value
 
-        val responseBody = HttpClient.get(GooglePlayApi.URL_FDFE + "/myAppsStream", headers, params)
+        val responseBody = httpClient.get(GooglePlayApi.URL_FDFE + "/myAppsStream", headers, params)
 
         return if (responseBody.isSuccessful) {
             val listResponse = getListResponseFromBytes(responseBody.responseBytes)

@@ -20,12 +20,16 @@ import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.StreamCluster
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
-import com.aurora.gplayapi.network.HttpClient
+import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
 
 class TopChartsHelper private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<TopChartsHelper, AuthData>(::TopChartsHelper)
+
+    override fun using(httpClient: IHttpClient) = apply {
+        this.httpClient = httpClient
+    }
 
     @Throws(Exception::class)
     fun getCluster(type: Type, chart: Chart): StreamCluster {
@@ -35,7 +39,7 @@ class TopChartsHelper private constructor(authData: AuthData) : BaseHelper(authD
         params["stcid"] = chart.value
         params["scat"] = type.value
 
-        val playResponse = HttpClient.get(GooglePlayApi.TOP_CHART_URL, headers, params)
+        val playResponse = httpClient.get(GooglePlayApi.TOP_CHART_URL, headers, params)
         return if (playResponse.isSuccessful) {
             val listResponse = getListResponseFromBytes(playResponse.responseBytes)
             getStreamCluster(listResponse)

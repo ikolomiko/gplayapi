@@ -24,14 +24,20 @@ import com.aurora.gplayapi.data.models.editor.EditorImage
 import com.aurora.gplayapi.data.models.subcategory.SubCategoryBundle
 import com.aurora.gplayapi.data.models.subcategory.SubCategoryCluster
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
-import com.aurora.gplayapi.network.HttpClient
+import com.aurora.gplayapi.network.DefaultHttpClient
+import com.aurora.gplayapi.network.IHttpClient
 import java.io.IOException
 import java.util.*
 
-open class BaseHelper(protected var authData: AuthData) {
+abstract class BaseHelper(protected var authData: AuthData) {
+
+    var httpClient: IHttpClient = DefaultHttpClient
+
+    abstract fun using(httpClient: IHttpClient): BaseHelper
+
     @Throws(IOException::class)
     fun getResponse(url: String, params: Map<String, String>, headers: Map<String, String>): PlayResponse {
-        return HttpClient.get(url, headers, params)
+        return httpClient.get(url, headers, params)
     }
 
     /*-------------------------------------------- COMMONS -------------------------------------------------*/
@@ -120,7 +126,7 @@ open class BaseHelper(protected var authData: AuthData) {
     @Throws(Exception::class)
     fun getNextStreamResponse(nextPageUrl: String): ListResponse {
         val headers: Map<String, String> = getDefaultHeaders(authData)
-        val playResponse = HttpClient.get(GooglePlayApi.URL_FDFE + "/" + nextPageUrl, headers)
+        val playResponse = httpClient.get(GooglePlayApi.URL_FDFE + "/" + nextPageUrl, headers)
         return if (playResponse.isSuccessful)
             getListResponseFromBytes(playResponse.responseBytes)
         else
@@ -130,7 +136,7 @@ open class BaseHelper(protected var authData: AuthData) {
     @Throws(Exception::class)
     fun getBrowseStreamResponse(browseUrl: String): BrowseResponse {
         val headers: Map<String, String> = getDefaultHeaders(authData)
-        val playResponse = HttpClient.get(GooglePlayApi.URL_FDFE + "/" + browseUrl, headers)
+        val playResponse = httpClient.get(GooglePlayApi.URL_FDFE + "/" + browseUrl, headers)
         return if (playResponse.isSuccessful)
             getBrowseResponseFromBytes(playResponse.responseBytes)
         else
@@ -255,7 +261,7 @@ open class BaseHelper(protected var authData: AuthData) {
     @Throws(Exception::class)
     fun getEditorChoiceBrowseResponse(nextPageUrl: String): ListResponse {
         val headers: Map<String, String> = getDefaultHeaders(authData)
-        val responseBody = HttpClient.get(GooglePlayApi.URL_FDFE + "/" + nextPageUrl, headers)
+        val responseBody = httpClient.get(GooglePlayApi.URL_FDFE + "/" + nextPageUrl, headers)
         val payload = getPrefetchPayLoad(responseBody.responseBytes)
         return payload.listResponse
     }

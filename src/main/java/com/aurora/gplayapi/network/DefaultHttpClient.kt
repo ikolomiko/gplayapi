@@ -28,7 +28,7 @@ import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-object HttpClient {
+object DefaultHttpClient : IHttpClient {
 
     private val okHttpClient: OkHttpClient = OkHttpClient().newBuilder()
             .connectTimeout(20, TimeUnit.SECONDS)
@@ -43,39 +43,39 @@ object HttpClient {
             .client(okHttpClient)
             .build()
 
-    private val HTTP_SERVICE: HttpService
+    private val RETRO_SERVICE: RetroService
 
     init {
-        HTTP_SERVICE = retrofit.create()
+        RETRO_SERVICE = retrofit.create()
     }
 
     @Throws(IOException::class)
-    fun post(url: String, headers: Map<String, String>, requestBody: RequestBody): PlayResponse {
-        val call = HTTP_SERVICE.post(url, headers, requestBody)
+    override fun post(url: String, headers: Map<String, String>, requestBody: RequestBody): PlayResponse {
+        val call = RETRO_SERVICE.post(url, headers, requestBody)
         return buildPlayResponse(call.execute())
     }
 
     @Throws(IOException::class)
-    fun post(url: String, headers: Map<String, String>, params: Map<String, String>): PlayResponse {
-        val call = HTTP_SERVICE.post(url, headers, params)
+    override fun post(url: String, headers: Map<String, String>, params: Map<String, String>): PlayResponse {
+        val call = RETRO_SERVICE.post(url, headers, params)
         return buildPlayResponse(call.execute())
     }
 
     @Throws(IOException::class)
-    fun get(url: String, headers: Map<String, String>): PlayResponse {
-        val call = HTTP_SERVICE.get(url, headers)
+    override fun get(url: String, headers: Map<String, String>): PlayResponse {
+        val call = RETRO_SERVICE.get(url, headers, hashMapOf())
         return buildPlayResponse(call.execute())
     }
 
     @Throws(IOException::class)
-    fun get(url: String, headers: Map<String, String>, params: Map<String, String>): PlayResponse {
-        val call = HTTP_SERVICE[url, headers, params]
+    override fun get(url: String, headers: Map<String, String>, params: Map<String, String>): PlayResponse {
+        val call = RETRO_SERVICE.get(url, headers, params)
         return buildPlayResponse(call.execute())
     }
 
     @Throws(IOException::class)
-    fun getX(url: String, headers: Map<String, String>, paramString: String): PlayResponse {
-        val call = HTTP_SERVICE[url + paramString, headers]
+    override fun getX(url: String, headers: Map<String, String>, paramString: String): PlayResponse {
+        val call = RETRO_SERVICE.get(url + paramString, headers, hashMapOf())
         return buildPlayResponse(call.execute())
     }
 

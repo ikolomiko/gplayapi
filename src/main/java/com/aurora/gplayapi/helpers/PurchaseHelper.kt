@@ -21,7 +21,7 @@ import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.File
 import com.aurora.gplayapi.data.providers.HeaderProvider
 import com.aurora.gplayapi.exceptions.ApiException
-import com.aurora.gplayapi.network.HttpClient
+import com.aurora.gplayapi.network.IHttpClient
 import java.io.IOException
 import java.util.*
 
@@ -29,13 +29,17 @@ class PurchaseHelper private constructor(authData: AuthData) : BaseHelper(authDa
 
     companion object : SingletonHolder<PurchaseHelper, AuthData>(::PurchaseHelper)
 
+    override fun using(httpClient: IHttpClient) = apply {
+        this.httpClient = httpClient
+    }
+
     @Throws(IOException::class)
     fun getBuyResponse(packageName: String, versionCode: Int, offerType: Int): BuyResponse {
         val params: MutableMap<String, String> = HashMap()
         params["ot"] = offerType.toString()
         params["doc"] = packageName
         params["vc"] = versionCode.toString()
-        val playResponse = HttpClient.post(GooglePlayApi.PURCHASE_URL, HeaderProvider.getDefaultHeaders(authData), params)
+        val playResponse = httpClient.post(GooglePlayApi.PURCHASE_URL, HeaderProvider.getDefaultHeaders(authData), params)
         val payload = getPayLoadFromBytes(playResponse.responseBytes)
         return payload.buyResponse
     }
@@ -62,7 +66,7 @@ class PurchaseHelper private constructor(authData: AuthData) : BaseHelper(authDa
             params["dtok"] = downloadToken
         }
 
-        val playResponse = HttpClient.get(GooglePlayApi.DELIVERY_URL, HeaderProvider.getDefaultHeaders(authData), params)
+        val playResponse = httpClient.get(GooglePlayApi.DELIVERY_URL, HeaderProvider.getDefaultHeaders(authData), params)
         val payload = ResponseWrapper.parseFrom(playResponse.responseBytes).payload
         return payload.deliveryResponse
     }

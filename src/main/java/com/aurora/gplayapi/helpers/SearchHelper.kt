@@ -19,7 +19,7 @@ import com.aurora.gplayapi.*
 import com.aurora.gplayapi.data.models.*
 import com.aurora.gplayapi.data.models.SearchBundle.SubBundle
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
-import com.aurora.gplayapi.network.HttpClient
+import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
 
 class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData) {
@@ -46,6 +46,10 @@ class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData
         }
     }
 
+    override fun using(httpClient: IHttpClient) = apply {
+        this.httpClient = httpClient
+    }
+
     private var query: String = String()
 
     @Throws(Exception::class)
@@ -56,7 +60,7 @@ class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData
                 5,
                 2 /*Text Entry*/,
                 3 /*Item Doc Id : 3 -> Apps*/)
-        val responseBody = HttpClient.getX(GooglePlayApi.URL_SEARCH_SUGGEST, header, paramString)
+        val responseBody = httpClient.getX(GooglePlayApi.URL_SEARCH_SUGGEST, header, paramString)
         val searchSuggestResponse = getSearchSuggestResponseFromBytes(responseBody.responseBytes)
         return if (searchSuggestResponse != null && searchSuggestResponse.entryCount > 0) {
             searchSuggestResponse.entryList
@@ -86,9 +90,9 @@ class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData
 
         val responseBody: PlayResponse
         responseBody = if (nextPageUrl.isNotEmpty()) {
-            HttpClient.get(GooglePlayApi.URL_SEARCH + "/" + nextPageUrl, header)
+            httpClient.get(GooglePlayApi.URL_SEARCH + "/" + nextPageUrl, header)
         } else {
-            HttpClient.get(GooglePlayApi.URL_SEARCH, header, param)
+            httpClient.get(GooglePlayApi.URL_SEARCH, header, param)
         }
 
         var searchBundle = SearchBundle()

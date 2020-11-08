@@ -19,15 +19,19 @@ import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.providers.HeaderProvider
-import com.aurora.gplayapi.network.HttpClient
+import com.aurora.gplayapi.network.IHttpClient
 
 class AuthValidator private constructor(authData: AuthData) : BaseHelper(authData) {
 
     companion object : SingletonHolder<AuthValidator, AuthData>(::AuthValidator)
 
+    override fun using(httpClient: IHttpClient) = apply {
+        this.httpClient = httpClient
+    }
+
     fun isValid(): Boolean {
         val headers = HeaderProvider.getDefaultHeaders(authData)
-        val playResponse = HttpClient.get(GooglePlayApi.URL_SELF_UPDATE, headers) // OR use contentSync
+        val playResponse = httpClient.get(GooglePlayApi.URL_SELF_UPDATE, headers) // OR use contentSync
         return playResponse.isSuccessful
     }
 }

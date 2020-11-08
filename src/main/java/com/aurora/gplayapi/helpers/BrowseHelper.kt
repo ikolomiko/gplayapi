@@ -20,7 +20,7 @@ import com.aurora.gplayapi.ResponseWrapper
 import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
-import com.aurora.gplayapi.network.HttpClient
+import com.aurora.gplayapi.network.IHttpClient
 import java.io.IOException
 import java.util.*
 
@@ -28,13 +28,17 @@ class BrowseHelper private constructor(authData: AuthData) : BaseHelper(authData
 
     companion object : SingletonHolder<BrowseHelper, AuthData>(::BrowseHelper)
 
+    override fun using(httpClient: IHttpClient) = apply {
+        this.httpClient = httpClient
+    }
+
     @Throws(IOException::class)
     fun getAllCategoriesList(type: Type) {
         val headers: MutableMap<String, String> = getDefaultHeaders(authData)
         val params: MutableMap<String, String> = HashMap()
         params["c"] = "3"
         params["cat"] = if (type == Type.GAME) "GAME" else "APPLICATION"
-        val responseBody = HttpClient.get(GooglePlayApi.TOP_CHART_URL, headers, params)
+        val responseBody = httpClient.get(GooglePlayApi.TOP_CHART_URL, headers, params)
         val responseWrapper = ResponseWrapper.parseFrom(responseBody.responseBytes)
         val payload = responseWrapper.payload
     }

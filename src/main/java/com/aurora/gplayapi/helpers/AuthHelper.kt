@@ -19,10 +19,20 @@ import com.aurora.gplayapi.DeviceManager
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.providers.DeviceInfoProvider
+import com.aurora.gplayapi.network.DefaultHttpClient
+import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
 
 class AuthHelper {
+
     companion object {
+
+        var httpClient: IHttpClient = DefaultHttpClient
+
+        fun using(httpClient: IHttpClient) = apply {
+            this.httpClient = httpClient
+        }
+
         fun build(email: String, aasToken: String): AuthData {
             val properties = DeviceManager.loadProperties("px_3a.properties")
             if (properties != null)
@@ -46,7 +56,7 @@ class AuthHelper {
             authData.deviceInfoProvider = deviceInfoProvider
             authData.locale = Locale.getDefault()
 
-            val api = GooglePlayApi(authData)
+            val api = GooglePlayApi(authData).via(httpClient)
             val gsfId = api.generateGsfId()
             authData.gsfId = gsfId
 
