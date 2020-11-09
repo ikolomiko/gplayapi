@@ -25,9 +25,6 @@ import com.aurora.gplayapi.exceptions.AuthException
 import com.aurora.gplayapi.network.DefaultHttpClient
 import com.aurora.gplayapi.network.IHttpClient
 import com.aurora.gplayapi.utils.Util
-import okhttp3.MediaType
-import okhttp3.Request
-import okhttp3.RequestBody
 import java.io.IOException
 import java.math.BigInteger
 import java.util.*
@@ -74,15 +71,10 @@ class GooglePlayApi(private val authData: AuthData) {
 
         val headers: MutableMap<String, String> = getDefaultHeaders(authData)
 
-        val requestBuilder = Request.Builder()
-                .url(URL_UPLOAD_DEVICE_CONFIG)
-                .post(RequestBody.create(MediaType.parse("application/x-protobuf"), request.toByteArray()))
 
-        val playResponse = requestBuilder.build().body()?.let {
-            httpClient.post(URL_UPLOAD_DEVICE_CONFIG, headers, it)
-        }
+        val playResponse = httpClient.post(URL_UPLOAD_DEVICE_CONFIG, headers, request.toByteArray())
 
-        val configResponse = ResponseWrapper.parseFrom(playResponse?.responseBytes)
+        val configResponse = ResponseWrapper.parseFrom(playResponse.responseBytes)
                 .payload
                 .uploadDeviceConfigResponse
 
@@ -107,13 +99,8 @@ class GooglePlayApi(private val authData: AuthData) {
         val headers: MutableMap<String, String> = getAuthHeaders(authData)
         headers["Content-Type"] = "application/x-protobuffer"
         headers["Host"] = "android.clients.google.com"
-        val requestBuilder = Request.Builder()
-                .url(URL_CHECK_IN)
-                .post(RequestBody.create(MediaType.parse("application/x-protobuf"), request))
-        val responseBody = requestBuilder.build().body()?.let {
-            httpClient.post(URL_CHECK_IN, headers, it)
-        }
-        return AndroidCheckinResponse.parseFrom(responseBody?.responseBytes)
+        val responseBody = httpClient.post(URL_CHECK_IN, headers, request)
+        return AndroidCheckinResponse.parseFrom(responseBody.responseBytes)
     }
 
     @Throws(IOException::class)

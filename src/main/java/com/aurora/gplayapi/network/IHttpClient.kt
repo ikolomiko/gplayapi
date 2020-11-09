@@ -16,12 +16,11 @@
 package com.aurora.gplayapi.network
 
 import com.aurora.gplayapi.data.models.PlayResponse
-import okhttp3.RequestBody
 import java.io.IOException
 
 interface IHttpClient {
     @Throws(IOException::class)
-    fun post(url: String, headers: Map<String, String>, requestBody: RequestBody): PlayResponse
+    fun post(url: String, headers: Map<String, String>, body: ByteArray): PlayResponse
 
     @Throws(IOException::class)
     fun post(url: String, headers: Map<String, String>, params: Map<String, String>): PlayResponse

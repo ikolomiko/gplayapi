@@ -62,29 +62,20 @@ class AppDetailsHelper private constructor(authData: AuthData) : BaseHelper(auth
             headers["Content-Type"] = "application/x-protobuf"
         }
 
-        val requestBuilder = Request.Builder()
-                .url(GooglePlayApi.URL_BULK_DETAILS)
-                .post(RequestBody.create(MediaType.parse("application/x-protobuf"), request))
+        val playResponse = httpClient.post(GooglePlayApi.URL_BULK_DETAILS, headers, request)
 
-        val playResponse = requestBuilder.build().body()?.let {
-            httpClient.post(GooglePlayApi.URL_BULK_DETAILS, headers, it)
-        }
-
-        if (playResponse != null) {
-            if (playResponse.isSuccessful) {
-                val payload = getPayLoadFromBytes(playResponse.responseBytes)
-                if (payload.hasBulkDetailsResponse()) {
-                    val bulkDetailsResponse = payload.bulkDetailsResponse
-                    for (entry in bulkDetailsResponse.entryList) {
-                        val app = AppBuilder.build(entry.item)
-                        //System.out.printf("%s -> %s\n", app.displayName, app.packageName);
-                        appList.add(app)
-                    }
+        if (playResponse.isSuccessful) {
+            val payload = getPayLoadFromBytes(playResponse.responseBytes)
+            if (payload.hasBulkDetailsResponse()) {
+                val bulkDetailsResponse = payload.bulkDetailsResponse
+                for (entry in bulkDetailsResponse.entryList) {
+                    val app = AppBuilder.build(entry.item)
+                    //System.out.printf("%s -> %s\n", app.displayName, app.packageName);
+                    appList.add(app)
                 }
-                return appList
-            } else
-                throw ApiException.Server(playResponse.errorString)
+            }
+            return appList
         } else
-            throw ApiException.Unknown()
+            throw ApiException.Server(playResponse.errorString)
     }
 }

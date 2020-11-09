@@ -17,10 +17,7 @@ package com.aurora.gplayapi.network
 
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.data.models.PlayResponse
-import okhttp3.Cache
-import okhttp3.OkHttpClient
-import okhttp3.RequestBody
-import okhttp3.ResponseBody
+import okhttp3.*
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.create
@@ -50,7 +47,7 @@ object DefaultHttpClient : IHttpClient {
     }
 
     @Throws(IOException::class)
-    override fun post(url: String, headers: Map<String, String>, requestBody: RequestBody): PlayResponse {
+    fun post(url: String, headers: Map<String, String>, requestBody: RequestBody): PlayResponse {
         val call = RETRO_SERVICE.post(url, headers, requestBody)
         return buildPlayResponse(call.execute())
     }
@@ -59,6 +56,12 @@ object DefaultHttpClient : IHttpClient {
     override fun post(url: String, headers: Map<String, String>, params: Map<String, String>): PlayResponse {
         val call = RETRO_SERVICE.post(url, headers, params)
         return buildPlayResponse(call.execute())
+    }
+
+    @Throws(IOException::class)
+    override fun post(url: String, headers: Map<String, String>, body: ByteArray): PlayResponse {
+        val requestBody = RequestBody.create(MediaType.parse("application/x-protobuf"), body)
+        return post(url, headers, requestBody)
     }
 
     @Throws(IOException::class)
@@ -90,8 +93,6 @@ object DefaultHttpClient : IHttpClient {
             }
             isSuccessful = response.isSuccessful
             code = response.code()
-        }.also {
-            println(response.raw())
         }
     }
 }
