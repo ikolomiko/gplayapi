@@ -1684,9 +1684,6 @@ message RedeemCodeResponse {
 message SelfUpdateResponse {
 }
 
-message searchSuggestResponse {
-}
-
 message GetInitialInstrumentFlowStateResponse {
 }
 
