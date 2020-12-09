@@ -104,10 +104,10 @@ class GooglePlayApi(private val authData: AuthData) {
     }
 
     @Throws(IOException::class)
-    fun generateAASToken(email: String, oauthToken: String): String? {
+    fun generateAASToken(oauthToken: String): String? {
         val params: MutableMap<String, String> = HashMap()
         params.putAll(getDefaultAuthParams(authData))
-        params.putAll(getAASTokenHeaders(email, oauthToken))
+        params.putAll(getAASTokenHeaders(oauthToken))
         val headers: MutableMap<String, String> = getAuthHeaders(authData)
         headers["app"] = "com.android.vending"
         val playResponse = httpClient.post(URL_AUTH, headers, params)

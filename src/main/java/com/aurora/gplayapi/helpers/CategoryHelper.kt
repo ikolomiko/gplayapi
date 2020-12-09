@@ -44,7 +44,7 @@ class CategoryHelper private constructor(authData: AuthData) : BaseHelper(authDa
         val playResponse = httpClient.get(GooglePlayApi.CATEGORIES_URL, headers, params)
         val listResponse = getListResponseFromBytes(playResponse.responseBytes)
 
-        if (listResponse!!.itemCount > 0) {
+        if (listResponse.itemCount > 0) {
             val item = listResponse.getItem(0)
             if (item.subItemCount > 0) {
                 val subItem = item.getSubItem(0)

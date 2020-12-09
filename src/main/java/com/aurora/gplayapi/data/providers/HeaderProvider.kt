@@ -64,7 +64,7 @@ object HeaderProvider {
         return headers
     }
 
-    fun getAASTokenHeaders(email: String, oauthToken: String): MutableMap<String, String> {
+    fun getAASTokenHeaders(oauthToken: String): MutableMap<String, String> {
         val headers: MutableMap<String, String> = HashMap()
         headers["service"] = "ac2dm"
         headers["add_account"] = "1"

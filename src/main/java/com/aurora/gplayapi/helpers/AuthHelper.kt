@@ -72,7 +72,6 @@ class AuthHelper {
             val token = api.generateToken(aasToken, GooglePlayApi.Service.GOOGLE_PLAY)
             authData.authToken = token
 
-            val tocResponse = api.toc()
             return authData
         }
     }
