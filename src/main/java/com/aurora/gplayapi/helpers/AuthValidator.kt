@@ -31,7 +31,7 @@ class AuthValidator private constructor(authData: AuthData) : BaseHelper(authDat
 
     fun isValid(): Boolean {
         val headers = HeaderProvider.getDefaultHeaders(authData)
-        val playResponse = httpClient.get(GooglePlayApi.URL_SELF_UPDATE, headers) // OR use contentSync
+        val playResponse = httpClient.post(GooglePlayApi.URL_SYNC, headers, hashMapOf()) // OR use contentSync
         return playResponse.isSuccessful
     }
 }
