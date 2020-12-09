@@ -20,33 +20,33 @@ import com.aurora.gplayapi.Features
 import com.aurora.gplayapi.FileMetadata
 
 class App(var packageName: String) {
-    var screenshotUrls: MutableList<String> = ArrayList()
-    var permissions: MutableList<String> = ArrayList()
-    var offerDetails: MutableMap<String, String> = HashMap()
-    var relatedLinks: MutableMap<String, String> = HashMap()
-    var dependencies: MutableSet<String> = HashSet()
-    var categoryIconUrl: String? = null
-    var categoryId: String? = null
-    var categoryName: String? = null
-    var changes: String? = null
-    var description: String? = null
-    var developerName: String? = null
-    var developerEmail: String? = null
-    var developerAddress: String? = null
-    var developerWebsite: String? = null
-    var displayName: String? = null
-    var downloadString: String? = null
-    var footerHtml: String? = null
-    var iconUrl: String? = null
-    var pageBackgroundUrl: String? = null
-    var instantAppLink: String? = null
-    var labeledRating: String? = null
-    var price: String? = null
-    var shortDescription: String? = null
-    var testingProgramEmail: String? = null
-    var updated: String? = null
-    var versionName: String? = null
-    var videoUrl: String? = null
+    var screenshotUrls: MutableList<String> = mutableListOf()
+    var permissions: MutableList<String> = mutableListOf()
+    var offerDetails: MutableMap<String, String> = mutableMapOf()
+    var relatedLinks: MutableMap<String, String> = mutableMapOf()
+    var dependencies: MutableSet<String> = mutableSetOf()
+    var categoryIconUrl: String = String()
+    var categoryId: String = String()
+    var categoryName: String = String()
+    var changes: String = String()
+    var description: String = String()
+    var developerName: String = String()
+    var developerEmail: String = String()
+    var developerAddress: String = String()
+    var developerWebsite: String = String()
+    var displayName: String = String()
+    var downloadString: String = String()
+    var footerHtml: String = String()
+    var iconUrl: String = String()
+    var pageBackgroundUrl: String = String()
+    var instantAppLink: String = String()
+    var labeledRating: String = String()
+    var price: String = String()
+    var shortDescription: String = String()
+    var testingProgramEmail: String = String()
+    var updated: String = String()
+    var versionName: String = String()
+    var videoUrl: String = String()
     var containsAds = false
     var earlyAccess = false
     var inPlayStore = false
@@ -56,14 +56,14 @@ class App(var packageName: String) {
     var testingProgramAvailable = false
     var testingProgramOptedIn = false
     var offerType = 0
-    var versionCode = 0
+    var versionCode: Long = 0
     var installs: Long = 0
     var size: Long = 0
-    var rating: Rating? = null
-    var restriction: Restriction? = null
+    var rating: Rating = Rating()
+    var restriction: Restriction = Restriction.NOT_RESTRICTED
 
     @Transient
-    var userReview: Review? = null
+    var userReview: Review = Review()
 
     @Transient
     var features: Features? = null

@@ -68,18 +68,6 @@ class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData
     }
 
     @Throws(Exception::class)
-    fun searchSuggestions2(query: String): List<SearchSuggestion> {
-        val searchSuggestions = searchSuggestions(query)
-        return searchSuggestions.map {
-            SearchSuggestion(
-                    type = it.type,
-                    title = it.title,
-                    packageName = it.packageNameContainer.packageName
-            )
-        }.toList()
-    }
-
-    @Throws(Exception::class)
     fun searchResults(query: String, nextPageUrl: String = ""): SearchBundle {
         this.query = query
         val header: MutableMap<String, String> = getDefaultHeaders(authData)

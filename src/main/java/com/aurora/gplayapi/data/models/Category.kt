@@ -23,7 +23,8 @@ class Category {
     var type: Type = Type.APPLICATION
 
     enum class Type(val value: String) {
-        GAME("GAME"), APPLICATION("APPLICATION");
+        GAME("GAME"),
+        APPLICATION("APPLICATION");
     }
 
     override fun hashCode(): Int {
