@@ -56,7 +56,7 @@ class App(var packageName: String) {
     var testingProgramAvailable = false
     var testingProgramOptedIn = false
     var offerType = 0
-    var versionCode: Long = 0
+    var versionCode: Int = 0
     var installs: Long = 0
     var size: Long = 0
     var rating: Rating = Rating()

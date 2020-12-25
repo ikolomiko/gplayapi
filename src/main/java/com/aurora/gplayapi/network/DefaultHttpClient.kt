@@ -15,84 +15,79 @@
 
 package com.aurora.gplayapi.network
 
-import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.data.models.PlayResponse
-import okhttp3.*
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.create
-import java.io.File
-import java.io.IOException
-import java.util.concurrent.TimeUnit
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.*
+import java.nio.charset.Charset
 
 object DefaultHttpClient : IHttpClient {
 
-    private val okHttpClient: OkHttpClient = OkHttpClient().newBuilder()
-            .connectTimeout(20, TimeUnit.SECONDS)
-            .cache(Cache(File("okhttp_cache"), 50 * 1024 * 1024L))
-            .retryOnConnectionFailure(true)
-            .followRedirects(true)
-            .followSslRedirects(true)
-            .build()
-
-    private val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl(GooglePlayApi.URL_BASE)
-            .client(okHttpClient)
-            .build()
-
-    private val RETRO_SERVICE: RetroService
-
-    init {
-        RETRO_SERVICE = retrofit.create()
-    }
-
-    @Throws(IOException::class)
-    fun post(url: String, headers: Map<String, String>, requestBody: RequestBody): PlayResponse {
-        val call = RETRO_SERVICE.post(url, headers, requestBody)
-        return buildPlayResponse(call.execute())
-    }
-
-    @Throws(IOException::class)
-    override fun post(url: String, headers: Map<String, String>, params: Map<String, String>): PlayResponse {
-        val call = RETRO_SERVICE.post(url, headers, params)
-        return buildPlayResponse(call.execute())
-    }
-
-    @Throws(IOException::class)
-    override fun post(url: String, headers: Map<String, String>, body: ByteArray): PlayResponse {
-        val requestBody = RequestBody.create(MediaType.parse("application/x-protobuf"), body)
-        return post(url, headers, requestBody)
-    }
-
-    @Throws(IOException::class)
     override fun get(url: String, headers: Map<String, String>): PlayResponse {
-        val call = RETRO_SERVICE.get(url, headers, hashMapOf())
-        return buildPlayResponse(call.execute())
+        return get(url, headers, hashMapOf())
     }
 
-    @Throws(IOException::class)
-    override fun get(url: String, headers: Map<String, String>, params: Map<String, String>): PlayResponse {
-        val call = RETRO_SERVICE.get(url, headers, params)
-        return buildPlayResponse(call.execute())
+    override fun get(
+            url: String,
+            headers: Map<String, String>,
+            params: Map<String, String>
+    ): PlayResponse {
+        val parameters = params
+                .map { it.key to it.value }
+                .toList()
+        val (request, response, result) = Fuel.get(url, parameters)
+                .header(headers)
+                .response()
+        return buildPlayResponse(response, request)
     }
 
-    @Throws(IOException::class)
-    override fun getX(url: String, headers: Map<String, String>, paramString: String): PlayResponse {
-        val call = RETRO_SERVICE.get(url + paramString, headers, hashMapOf())
-        return buildPlayResponse(call.execute())
+    override fun getX(
+            url: String,
+            headers: Map<String, String>,
+            paramString: String
+    ): PlayResponse {
+        val (request, response, result) = Fuel.get(url + paramString)
+                .header(headers)
+                .response()
+        return buildPlayResponse(response, request)
+    }
+
+    override fun post(url: String, headers: Map<String, String>, body: ByteArray): PlayResponse {
+        val (request, response, result) = Fuel.post(url)
+                .header(headers)
+                .appendHeader(Headers.CONTENT_TYPE, "application/x-protobuf")
+                .body(body, Charset.defaultCharset())
+                .response()
+        return buildPlayResponse(response, request)
+    }
+
+    override fun post(
+            url: String,
+            headers: Map<String, String>,
+            params: Map<String, String>
+    ): PlayResponse {
+        val parameters = params
+                .map { it.key to it.value }
+                .toList()
+        val (request, response, result) = Fuel.post(url, parameters)
+                .header(headers)
+                .response()
+        return buildPlayResponse(response, request)
     }
 
     @JvmStatic
-    private fun buildPlayResponse(response: Response<ResponseBody>): PlayResponse {
+    private fun buildPlayResponse(response: Response, request: Request): PlayResponse {
         return PlayResponse().apply {
-            if (response.body() != null)
-                responseBytes = response.body()!!.bytes()
-            if (response.errorBody() != null) {
-                errorBytes = response.errorBody()!!.bytes()
+
+            if (response.isSuccessful) {
+                responseBytes = response.body().toByteArray()
+            }
+
+            if (response.isClientError || response.isServerError) {
+                errorBytes = response.responseMessage.toByteArray()
                 errorString = String(errorBytes)
             }
             isSuccessful = response.isSuccessful
-            code = response.code()
+            code = response.statusCode
         }
     }
 }

@@ -15,9 +15,9 @@
 
 package com.aurora.gplayapi.utils;
 
-import okhttp3.HttpUrl;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 public class Util {
 
@@ -31,17 +31,5 @@ public class Util {
             }
         }
         return keyValueMap;
-    }
-
-    public static String buildUrlEx(String url, Map<String, List<String>> params) {
-        final HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
-        if (null != params && !params.isEmpty()) {
-            for (String name : params.keySet()) {
-                for (String value : params.get(name)) {
-                    urlBuilder.addQueryParameter(name, value);
-                }
-            }
-        }
-        return urlBuilder.build().toString();
     }
 }

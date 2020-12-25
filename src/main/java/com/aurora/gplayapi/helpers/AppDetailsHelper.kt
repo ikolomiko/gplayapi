@@ -23,9 +23,6 @@ import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.exceptions.ApiException
 import com.aurora.gplayapi.network.IHttpClient
-import okhttp3.MediaType
-import okhttp3.Request
-import okhttp3.RequestBody
 import java.util.*
 
 class AppDetailsHelper private constructor(authData: AuthData) : BaseHelper(authData) {
