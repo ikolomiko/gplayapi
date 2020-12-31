@@ -107,7 +107,7 @@ object AppBuilder {
                 aggregateRating.fourStarRatings,
                 aggregateRating.fiveStarRatings,
                 aggregateRating.thumbsUpCount,
-                aggregateRating.thumbsUpCount,
+                aggregateRating.thumbsDownCount,
                 aggregateRating.ratingLabel,
                 aggregateRating.ratingCountLabelAbbreviated
         )
