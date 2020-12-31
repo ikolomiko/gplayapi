@@ -15,15 +15,14 @@
 
 package com.aurora.gplayapi.data.models
 
-import java.util.*
-
-data class StreamBundle(val id: String = UUID.randomUUID().toString()) {
-    var title: String = String()
-    var nextPageUrl: String = String()
-    var streamClusters: MutableList<StreamCluster> = ArrayList()
+class StreamBundle {
+    val id: Int = -1
+    var streamTitle: String = String()
+    var streamNextPageUrl: String = String()
+    var streamClusters: MutableMap<Int, StreamCluster> = mutableMapOf()
 
     operator fun hasNext(): Boolean {
-        return nextPageUrl.isNotBlank()
+        return streamNextPageUrl.isNotBlank()
     }
 
     fun hasCluster(): Boolean {

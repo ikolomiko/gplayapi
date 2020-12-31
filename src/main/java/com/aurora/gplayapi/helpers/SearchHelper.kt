@@ -16,7 +16,10 @@
 package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.*
-import com.aurora.gplayapi.data.models.*
+import com.aurora.gplayapi.data.models.App
+import com.aurora.gplayapi.data.models.AuthData
+import com.aurora.gplayapi.data.models.PlayResponse
+import com.aurora.gplayapi.data.models.SearchBundle
 import com.aurora.gplayapi.data.models.SearchBundle.SubBundle
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.IHttpClient
@@ -114,7 +117,7 @@ class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData
 
     private fun getSearchBundle(listResponse: ListResponse): SearchBundle {
         val searchBundle = SearchBundle()
-        val appList: MutableList<App> = ArrayList()
+        val appList: MutableSet<App> = mutableSetOf()
         val itemList = listResponse.itemList
         for (item in itemList) {
             if (item.subItemCount > 0) {

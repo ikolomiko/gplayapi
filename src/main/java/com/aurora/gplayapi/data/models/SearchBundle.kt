@@ -17,11 +17,12 @@ package com.aurora.gplayapi.data.models
 
 import java.util.*
 
-data class SearchBundle(val id: String = UUID.randomUUID().toString()) {
+class SearchBundle {
+    var id: Int = -1
     var query: String = String()
     var suggestionTerms: MutableSet<String> = HashSet()
     var subBundles: MutableSet<SubBundle> = hashSetOf()
-    var appList: MutableList<App> = mutableListOf()
+    var appList: MutableSet<App> = mutableSetOf()
 
     enum class Type {
         GENERIC, SIMILAR, RELATED_SEARCHES, RELATED_TO_YOUR_SEARCH, YOU_MIGHT_ALSO_LIKE, BOGUS

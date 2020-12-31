@@ -85,8 +85,8 @@ abstract class BaseHelper(protected var authData: AuthData) {
         } else payload
     }
 
-    fun getAppsFromItem(item: Item): MutableList<App> {
-        val appList: MutableList<App> = ArrayList()
+    fun getAppsFromItem(item: Item): MutableSet<App> {
+        val appList: MutableSet<App> = mutableSetOf()
         if (item.subItemCount > 0) {
             for (subItem in item.subItemList) {
                 if (subItem.type == 1) {
@@ -152,13 +152,16 @@ abstract class BaseHelper(protected var authData: AuthData) {
     fun getStreamCluster(item: Item): StreamCluster {
         val title = if (item.hasTitle()) item.title else String()
         val subtitle = if (item.hasSubtitle()) item.subtitle else String()
-        val streamCluster = StreamCluster()
-        streamCluster.title = title
-        streamCluster.subtitle = subtitle
-        streamCluster.browseUrl = getBrowseUrl(item)
-        streamCluster.nextPageUrl = getNextPageUrl(item)
-        streamCluster.appList = getAppsFromItem(item)
-        return streamCluster
+        val browseUrl = getBrowseUrl(item)
+
+        return StreamCluster().apply {
+            id = browseUrl.hashCode()
+            clusterTitle = title
+            clusterSubtitle = subtitle
+            clusterBrowseUrl = browseUrl
+            clusterNextPageUrl = getNextPageUrl(item)
+            clusterAppList = getAppsFromItem(item)
+        }
     }
 
     fun getStreamCluster(payload: Payload): StreamCluster {
@@ -193,21 +196,25 @@ abstract class BaseHelper(protected var authData: AuthData) {
 
     fun getStreamBundle(listResponse: ListResponse): StreamBundle {
         var nextPageUrl = String()
-        val streamClusters: MutableList<StreamCluster> = ArrayList()
+        var title = String()
+        val streamClusterMap: MutableMap<Int, StreamCluster> = mutableMapOf()
+
         if (listResponse.itemCount > 0) {
             val item = listResponse.getItem(0)
             if (item != null && item.subItemCount > 0) {
                 for (subItem in item.subItemList) {
-                    streamClusters.add(getStreamCluster(subItem))
+                    val streamCluster = getStreamCluster(subItem)
+                    streamClusterMap[streamCluster.id] = streamCluster
                 }
+                title = item.title
                 nextPageUrl = getNextPageUrl(item)
             }
         }
-        val streamBundle = StreamBundle()
-        streamBundle.title = ""
-        streamBundle.nextPageUrl = nextPageUrl
-        streamBundle.streamClusters = streamClusters
-        return streamBundle
+        return StreamBundle().apply {
+            streamTitle = title
+            streamNextPageUrl = nextPageUrl
+            streamClusters = streamClusterMap
+        }
     }
 
     /*------------------------------------- SUBCATEGORY STREAMS & BUNDLES ------------------------------------*/

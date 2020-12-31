@@ -15,17 +15,15 @@
 
 package com.aurora.gplayapi.data.models
 
-import java.util.*
-import kotlin.collections.ArrayList
-
-data class StreamCluster(val id: String = UUID.randomUUID().toString()) {
-    var title: String = String()
-    var subtitle: String = String()
-    var nextPageUrl: String = String()
-    var browseUrl: String = String()
-    var appList: MutableList<App> = ArrayList()
+class StreamCluster {
+    var id: Int = -1
+    var clusterTitle: String = String()
+    var clusterSubtitle: String = String()
+    var clusterNextPageUrl: String = String()
+    var clusterBrowseUrl: String = String()
+    var clusterAppList: MutableSet<App> = mutableSetOf()
 
     fun hasNext(): Boolean {
-        return nextPageUrl.isNotBlank()
+        return clusterNextPageUrl.isNotBlank()
     }
 }
