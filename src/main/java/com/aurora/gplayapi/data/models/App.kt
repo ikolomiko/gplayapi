@@ -20,12 +20,12 @@ import com.aurora.gplayapi.Features
 import com.aurora.gplayapi.FileMetadata
 
 class App(var packageName: String) {
-    var screenshotUrls: MutableList<String> = mutableListOf()
+    var screenshots: MutableList<Artwork> = mutableListOf()
     var permissions: MutableList<String> = mutableListOf()
     var offerDetails: MutableMap<String, String> = mutableMapOf()
     var relatedLinks: MutableMap<String, String> = mutableMapOf()
     var dependencies: MutableSet<String> = mutableSetOf()
-    var categoryIconUrl: String = String()
+    var categoryArtwork: Artwork = Artwork()
     var categoryId: String = String()
     var categoryName: String = String()
     var changes: String = String()
@@ -37,8 +37,8 @@ class App(var packageName: String) {
     var displayName: String = String()
     var downloadString: String = String()
     var footerHtml: String = String()
-    var iconUrl: String = String()
-    var pageBackgroundUrl: String = String()
+    var iconArtwork: Artwork = Artwork()
+    var pageBackgroundUrl: Artwork = Artwork()
     var instantAppLink: String = String()
     var labeledRating: String = String()
     var price: String = String()
@@ -46,7 +46,7 @@ class App(var packageName: String) {
     var testingProgramEmail: String = String()
     var updated: String = String()
     var versionName: String = String()
-    var videoUrl: String = String()
+    var videoArtwork: Artwork = Artwork()
     var containsAds = false
     var earlyAccess = false
     var inPlayStore = false

@@ -18,6 +18,7 @@ package com.aurora.gplayapi.data.builders
 import com.aurora.gplayapi.*
 import com.aurora.gplayapi.data.builders.ReviewBuilder.build
 import com.aurora.gplayapi.data.models.App
+import com.aurora.gplayapi.data.models.Artwork
 import com.aurora.gplayapi.data.models.Rating
 import java.util.*
 
@@ -38,7 +39,7 @@ object AppBuilder {
         val appDetails = item.details.appDetails
         val app = App(appDetails.packageName)
 
-        app.screenshotUrls = ArrayList()
+        app.screenshots = ArrayList()
         app.permissions = ArrayList()
         app.dependencies = HashSet()
         app.offerDetails = HashMap()
@@ -81,7 +82,7 @@ object AppBuilder {
         app.developerAddress = appDetails.developerAddress
         app.developerWebsite = appDetails.developerWebsite
 
-        if (app.developerName!!.isNotEmpty()) app.developerName = item.creator
+        if (app.developerName.isNotEmpty()) app.developerName = item.creator
 
         if (appDetails.hasInstantLink && appDetails.instantLink!!.isNotEmpty()) {
             app.instantAppLink = appDetails.instantLink
@@ -92,7 +93,7 @@ object AppBuilder {
             app.testingProgramEmail = appDetails.testingProgramInfo.testingProgramEmail
         }
 
-        fillImages(app, item.imageList)
+        fillArtwork(app, item.imageList)
         fillDependencies(app, appDetails)
         fillOfferDetails(app, item)
         return app
@@ -136,14 +137,20 @@ object AppBuilder {
         }
     }
 
-    private fun fillImages(app: App, images: List<Image>) {
+    private fun fillArtwork(app: App, images: List<Image>) {
         for (image in images) {
+            val artwork = Artwork().apply {
+                url = image.imageUrl
+                aspectRatio = image.dimension.aspectRatio
+                width = image.dimension.width
+                height = image.dimension.height
+            }
             when (image.imageType) {
-                Constants.IMAGE_TYPE_CATEGORY_ICON -> app.categoryIconUrl = image.imageUrl
-                Constants.IMAGE_TYPE_APP_ICON -> app.iconUrl = image.imageUrl
-                Constants.IMAGE_TYPE_YOUTUBE_VIDEO_LINK -> app.videoUrl = image.imageUrl
-                Constants.IMAGE_TYPE_PLAY_STORE_PAGE_BACKGROUND -> app.pageBackgroundUrl = image.imageUrl
-                Constants.IMAGE_TYPE_APP_SCREENSHOT -> app.screenshotUrls.add(image.imageUrl)
+                Constants.IMAGE_TYPE_CATEGORY_ICON -> app.categoryArtwork = artwork
+                Constants.IMAGE_TYPE_APP_ICON -> app.iconArtwork = artwork
+                Constants.IMAGE_TYPE_YOUTUBE_VIDEO_LINK -> app.videoArtwork = artwork
+                Constants.IMAGE_TYPE_PLAY_STORE_PAGE_BACKGROUND -> app.pageBackgroundUrl = artwork
+                Constants.IMAGE_TYPE_APP_SCREENSHOT -> app.screenshots.add(artwork)
             }
         }
     }
