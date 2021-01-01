@@ -149,7 +149,7 @@ object AppBuilder {
                 Constants.IMAGE_TYPE_CATEGORY_ICON -> app.categoryArtwork = artwork
                 Constants.IMAGE_TYPE_APP_ICON -> app.iconArtwork = artwork
                 Constants.IMAGE_TYPE_YOUTUBE_VIDEO_LINK -> app.videoArtwork = artwork
-                Constants.IMAGE_TYPE_PLAY_STORE_PAGE_BACKGROUND -> app.pageBackgroundUrl = artwork
+                Constants.IMAGE_TYPE_PLAY_STORE_PAGE_BACKGROUND -> app.coverArtwork = artwork
                 Constants.IMAGE_TYPE_APP_SCREENSHOT -> app.screenshots.add(artwork)
             }
         }

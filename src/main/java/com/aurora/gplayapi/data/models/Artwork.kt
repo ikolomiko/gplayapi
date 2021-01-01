@@ -20,4 +20,15 @@ class Artwork {
     var aspectRatio: Int = -1
     var width: Int = 0
     var height: Int = 0
+
+    override fun hashCode(): Int {
+        return url.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            is Artwork -> url == other.url
+            else -> false
+        }
+    }
 }

@@ -38,7 +38,7 @@ class App(var packageName: String) {
     var downloadString: String = String()
     var footerHtml: String = String()
     var iconArtwork: Artwork = Artwork()
-    var pageBackgroundUrl: Artwork = Artwork()
+    var coverArtwork: Artwork = Artwork()
     var instantAppLink: String = String()
     var labeledRating: String = String()
     var price: String = String()
