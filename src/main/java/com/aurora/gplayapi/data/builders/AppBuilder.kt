@@ -38,12 +38,7 @@ object AppBuilder {
     fun build(item: Item): App {
         val appDetails = item.details.appDetails
         val app = App(appDetails.packageName)
-
-        app.screenshots = ArrayList()
-        app.permissions = ArrayList()
-        app.dependencies = HashSet()
-        app.offerDetails = HashMap()
-        app.relatedLinks = HashMap()
+        app.id = appDetails.packageName.hashCode()
         app.displayName = item.title
         app.description = item.descriptionHtml
         app.shortDescription = item.promotionalDescription

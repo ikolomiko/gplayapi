@@ -22,7 +22,7 @@ class SearchBundle {
     var query: String = String()
     var suggestionTerms: MutableSet<String> = HashSet()
     var subBundles: MutableSet<SubBundle> = hashSetOf()
-    var appList: MutableSet<App> = mutableSetOf()
+    var appList: MutableList<App> = mutableListOf()
 
     enum class Type {
         GENERIC, SIMILAR, RELATED_SEARCHES, RELATED_TO_YOUR_SEARCH, YOU_MIGHT_ALSO_LIKE, BOGUS

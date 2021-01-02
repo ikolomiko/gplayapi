@@ -117,14 +117,16 @@ class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData
 
     private fun getSearchBundle(listResponse: ListResponse): SearchBundle {
         val searchBundle = SearchBundle()
-        val appList: MutableSet<App> = mutableSetOf()
+        val appList: MutableList<App> = mutableListOf()
         val itemList = listResponse.itemList
         for (item in itemList) {
             if (item.subItemCount > 0) {
                 for (subItem in item.subItemList) {
                     //Filter out only apps, discard other items (Music, Ebooks, Movies)
                     if (subItem.type == 45) {
-                        appList.addAll(getAppsFromItem(subItem))
+                        if (subItem.title.isEmpty() || subItem.title == "Apps") {
+                            appList.addAll(getAppsFromItem(subItem))
+                        }
                     }
                     searchBundle.subBundles.add(getSubBundle(subItem))
                 }

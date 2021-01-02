@@ -21,5 +21,5 @@ class SubCategoryCluster {
     var title: String = String()
     var browseUrl: String = String()
     var nextPageUrl: String = String()
-    var appList: MutableSet<App> = mutableSetOf()
+    var appList: MutableList<App> = mutableListOf()
 }

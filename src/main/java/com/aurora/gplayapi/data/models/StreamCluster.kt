@@ -15,13 +15,15 @@
 
 package com.aurora.gplayapi.data.models
 
+import java.util.*
+
 class StreamCluster {
     var id: Int = -1
     var clusterTitle: String = String()
     var clusterSubtitle: String = String()
     var clusterNextPageUrl: String = String()
     var clusterBrowseUrl: String = String()
-    var clusterAppList: MutableSet<App> = mutableSetOf()
+    var clusterAppList: MutableList<App> = mutableListOf()
 
     fun hasNext(): Boolean {
         return clusterNextPageUrl.isNotBlank()

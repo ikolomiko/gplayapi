@@ -85,14 +85,14 @@ abstract class BaseHelper(protected var authData: AuthData) {
         } else payload
     }
 
-    fun getAppsFromItem(item: Item): MutableSet<App> {
-        val appList: MutableSet<App> = mutableSetOf()
+    fun getAppsFromItem(item: Item): MutableList<App> {
+        val appList: MutableList<App> = mutableListOf()
         if (item.subItemCount > 0) {
             for (subItem in item.subItemList) {
                 if (subItem.type == 1) {
                     val app = build(subItem)
                     appList.add(app)
-                    //System.out.printf("%s -> %s\n", app.displayName, app.packageName);
+                    System.out.printf("%s -> %s\n", app.displayName, app.packageName);
                 }
             }
         }

@@ -20,6 +20,7 @@ import com.aurora.gplayapi.Features
 import com.aurora.gplayapi.FileMetadata
 
 class App(var packageName: String) {
+    var id: Int = 0
     var screenshots: MutableList<Artwork> = mutableListOf()
     var permissions: MutableList<String> = mutableListOf()
     var offerDetails: MutableMap<String, String> = mutableMapOf()
