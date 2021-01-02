@@ -20,6 +20,7 @@ import java.util.*
 
 data class AuthData(val email: String,
                     val aasToken: String) {
+    var isAnonymous: Boolean = false
     var authToken: String = String()
     var gsfId: String = String()
     var tokenDispenserUrl: String = String()
