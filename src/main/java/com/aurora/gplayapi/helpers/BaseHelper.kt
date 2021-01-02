@@ -92,7 +92,7 @@ abstract class BaseHelper(protected var authData: AuthData) {
                 if (subItem.type == 1) {
                     val app = build(subItem)
                     appList.add(app)
-                    System.out.printf("%s -> %s\n", app.displayName, app.packageName);
+                    //System.out.printf("%s -> %s\n", app.displayName, app.packageName);
                 }
             }
         }
