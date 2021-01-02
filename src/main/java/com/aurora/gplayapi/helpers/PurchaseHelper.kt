@@ -81,7 +81,7 @@ class PurchaseHelper private constructor(authData: AuthData) : BaseHelper(authDa
 
         when (deliveryResponse.status) {
             1 ->
-                return getDownloadsFromDeliveryResponse(packageName, deliveryResponse)
+                return getDownloadsFromDeliveryResponse(packageName, versionCode, deliveryResponse)
             2 ->
                 throw ApiException.AppNotSupported()
             3 ->
@@ -92,30 +92,31 @@ class PurchaseHelper private constructor(authData: AuthData) : BaseHelper(authDa
         }
     }
 
-    private fun getDownloadsFromDeliveryResponse(packageName: String?, deliveryResponse: DeliveryResponse?): List<File> {
+    private fun getDownloadsFromDeliveryResponse(packageName: String?, versionCode: Int, deliveryResponse: DeliveryResponse?): List<File> {
         val fileList: MutableList<File> = ArrayList()
         if (deliveryResponse != null) {
             //Add base apk
             val androidAppDeliveryData = deliveryResponse.appDeliveryData
             if (androidAppDeliveryData != null) {
-                fileList.add(File(
-                        name = String.format("%s.apk", packageName),
-                        url = androidAppDeliveryData.downloadUrl,
-                        size = androidAppDeliveryData.downloadSize,
-                        type = File.FileType.BASE
-                ))
+                fileList.add(File().apply {
+                    name = "${packageName}.apk"
+                    url = androidAppDeliveryData.downloadUrl
+                    size = androidAppDeliveryData.downloadSize
+                    type = File.FileType.BASE
+                })
 
                 //Obb & patches (if any)
                 val fileMetadataList = deliveryResponse.appDeliveryData.additionalFileList
                 if (fileMetadataList != null) {
                     for (appFileMetadata in fileMetadataList) {
                         val isOBB = appFileMetadata.fileType == 0
-                        fileList.add(File(
-                                name = String.format("%s.%s.%s", if (isOBB) "main" else "patch", packageName, "obb"),
-                                url = appFileMetadata.downloadUrl,
-                                size = appFileMetadata.size,
-                                type = if (appFileMetadata.fileType == 0) File.FileType.OBB else File.FileType.PATCH
-                        ))
+                        val fileType = if (isOBB) "main" else "patch"
+                        fileList.add(File().apply {
+                            name = "$fileType.$versionCode.$packageName.obb"
+                            url = appFileMetadata.downloadUrl
+                            size = appFileMetadata.size
+                            type = if (isOBB) File.FileType.OBB else File.FileType.PATCH
+                        })
                     }
                 }
 
@@ -123,12 +124,12 @@ class PurchaseHelper private constructor(authData: AuthData) : BaseHelper(authDa
                 val splitDeliveryDataList = deliveryResponse.appDeliveryData.splitDeliveryDataList
                 if (fileMetadataList != null) {
                     for (splitDeliveryData in splitDeliveryDataList) {
-                        fileList.add(File(
-                                name = splitDeliveryData.name,
-                                url = splitDeliveryData.downloadUrl,
-                                size = splitDeliveryData.downloadSize,
-                                type = File.FileType.SPLIT
-                        ))
+                        fileList.add(File().apply {
+                            name = "${splitDeliveryData.name}.apk"
+                            url = splitDeliveryData.downloadUrl
+                            size = splitDeliveryData.downloadSize
+                            type = File.FileType.SPLIT
+                        })
                     }
                 }
             }
