@@ -15,11 +15,11 @@
 
 package com.aurora.gplayapi.data.models.editor
 
-import java.util.*
-import kotlin.collections.ArrayList
+import com.aurora.gplayapi.data.models.Artwork
 
-data class EditorChoiceCluster(val id: String = UUID.randomUUID().toString()) {
-    var title: String = String()
-    var browseUrl: String = String()
-    var imageList: List<EditorImage> = ArrayList()
+class EditorChoiceCluster {
+    var id: Int = -1
+    var clusterTitle: String = String()
+    var clusterBrowseUrl: String = String()
+    var clusterArtwork: List<Artwork> = ArrayList()
 }

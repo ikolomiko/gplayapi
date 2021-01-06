@@ -20,7 +20,6 @@ import com.aurora.gplayapi.data.builders.AppBuilder.build
 import com.aurora.gplayapi.data.models.*
 import com.aurora.gplayapi.data.models.editor.EditorChoiceBundle
 import com.aurora.gplayapi.data.models.editor.EditorChoiceCluster
-import com.aurora.gplayapi.data.models.editor.EditorImage
 import com.aurora.gplayapi.data.models.subcategory.SubCategoryBundle
 import com.aurora.gplayapi.data.models.subcategory.SubCategoryCluster
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
@@ -295,20 +294,24 @@ abstract class BaseHelper(protected var authData: AuthData) {
 
     fun getEditorChoiceCluster(item: Item): EditorChoiceCluster {
         val title = if (item.hasTitle()) item.title else String()
-        val imageList: MutableList<EditorImage> = ArrayList()
+        val artworkList: MutableList<Artwork> = ArrayList()
+        val browseUrl = getBrowseUrl(item)
         if (item.imageCount > 0) {
             item.imageList.forEach {
-                imageList.add(EditorImage(
-                        it.imageType,
-                        it.imageUrl
-                ))
+                artworkList.add(Artwork().apply {
+                    url = it.imageUrl
+                    aspectRatio = it.dimension.aspectRatio
+                    width = it.dimension.width
+                    height = it.dimension.height
+                })
             }
         }
-        val editorChoiceCluster = EditorChoiceCluster()
-        editorChoiceCluster.title = title
-        editorChoiceCluster.browseUrl = getBrowseUrl(item)
-        editorChoiceCluster.imageList = imageList
-        return editorChoiceCluster
+        return EditorChoiceCluster().apply {
+            id = browseUrl.hashCode()
+            clusterTitle = title
+            clusterBrowseUrl = browseUrl
+            clusterArtwork = artworkList
+        }
     }
 
     fun getEditorChoiceBundles(item: Item): EditorChoiceBundle {
@@ -317,10 +320,12 @@ abstract class BaseHelper(protected var authData: AuthData) {
         for (subItem in item.subItemList) {
             choiceClusters.add(getEditorChoiceCluster(subItem))
         }
-        return EditorChoiceBundle(
-                title = title,
-                choiceClusters = choiceClusters
-        )
+
+        return EditorChoiceBundle().apply {
+            id = title.hashCode()
+            bundleTitle = title
+            bundleChoiceClusters = choiceClusters
+        }
     }
 
     fun getEditorChoiceBundles(listResponse: ListResponse?): List<EditorChoiceBundle> {
@@ -331,7 +336,7 @@ abstract class BaseHelper(protected var authData: AuthData) {
                 if (item.subItemCount > 0) {
                     for (subItem in item.subItemList) {
                         val bundle = getEditorChoiceBundles(subItem)
-                        if (bundle.choiceClusters.isNotEmpty()) {
+                        if (bundle.bundleChoiceClusters.isNotEmpty()) {
                             editorChoiceBundles.add(bundle)
                         }
                     }
