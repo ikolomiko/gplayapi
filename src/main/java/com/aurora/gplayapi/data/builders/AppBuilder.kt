@@ -135,6 +135,7 @@ object AppBuilder {
     private fun fillArtwork(app: App, images: List<Image>) {
         for (image in images) {
             val artwork = Artwork().apply {
+                type = image.imageType
                 url = image.imageUrl
                 aspectRatio = image.dimension.aspectRatio
                 width = image.dimension.width

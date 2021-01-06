@@ -299,6 +299,7 @@ abstract class BaseHelper(protected var authData: AuthData) {
         if (item.imageCount > 0) {
             item.imageList.forEach {
                 artworkList.add(Artwork().apply {
+                    type =  it.imageType
                     url = it.imageUrl
                     aspectRatio = it.dimension.aspectRatio
                     width = it.dimension.width

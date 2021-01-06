@@ -16,8 +16,9 @@
 package com.aurora.gplayapi.data.models
 
 class Artwork {
+    var type: Int = 0
     var url: String = String()
-    var aspectRatio: Int = -1
+    var aspectRatio: Int = 0
     var width: Int = 0
     var height: Int = 0
 
