@@ -18,8 +18,17 @@ package com.aurora.gplayapi.data.models
 import com.aurora.gplayapi.data.providers.DeviceInfoProvider
 import java.util.*
 
-data class AuthData(val email: String,
-                    val aasToken: String) {
+class AuthData {
+
+    private constructor()
+
+    constructor(email: String, aasToken: String) {
+        this.email = email
+        this.aasToken = aasToken
+    }
+
+    var email: String = String()
+    var aasToken: String = String()
     var isAnonymous: Boolean = false
     var authToken: String = String()
     var gsfId: String = String()

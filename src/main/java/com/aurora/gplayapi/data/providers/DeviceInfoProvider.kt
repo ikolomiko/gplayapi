@@ -20,17 +20,17 @@ import java.util.*
 
 class DeviceInfoProvider(var properties: Properties, var localeString: String) : BaseDeviceInfoProvider() {
 
+    @Transient
     private var timeToReport = System.currentTimeMillis() / 1000
 
     init {
         ensureCompatibility(properties)
     }
 
-    val isValid: Boolean = properties.keys.containsAll(listOf(*requiredFields))
     override val sdkVersion: Int = properties.getProperty("Build.VERSION.SDK_INT").toInt()
     override val playServicesVersion: Int = properties.getProperty("GSF.version").toInt()
     override val mccMnc: String = properties.getProperty("SimOperator")
-    override val authUserAgentString: String = "GoogleAuth/1.4 (" + properties.getProperty("Build.DEVICE") + " " + properties.getProperty("Build.ID") + ")"
+    override val authUserAgentString: String = ("GoogleAuth/1.4 (${properties.getProperty("Build.DEVICE")} ${properties.getProperty("Build.ID")})")
 
     override val userAgentString: String
         get() {
@@ -88,29 +88,29 @@ class DeviceInfoProvider(var properties: Properties, var localeString: String) :
                 .build()
     }
 
-    override val deviceConfigurationProto: DeviceConfigurationProto
-        get() = DeviceConfigurationProto.newBuilder()
-                .setTouchScreen(getInt("TouchScreen"))
-                .setKeyboard(getInt("Keyboard"))
-                .setNavigation(getInt("Navigation"))
-                .setScreenLayout(getInt("ScreenLayout"))
-                .setHasHardKeyboard(properties.getProperty("HasHardKeyboard").toBoolean())
-                .setHasFiveWayNavigation(properties.getProperty("HasFiveWayNavigation").toBoolean())
-                .setLowRamDevice(properties.getProperty("LowRamDevice", "0").toInt())
-                .setMaxNumOfCPUCores(properties.getProperty("MaxNumOfCPUCores", "8").toInt())
-                .setTotalMemoryBytes(properties.getProperty("TotalMemoryBytes", "8589935000").toLong())
-                .setDeviceClass(0)
-                .setScreenDensity(getInt("Screen.Density"))
-                .setScreenWidth(getInt("Screen.Width"))
-                .setScreenHeight(getInt("Screen.Height"))
-                .addAllNativePlatform(getList("Platforms"))
-                .addAllSystemSharedLibrary(getList("SharedLibraries"))
-                .addAllSystemAvailableFeature(getList("Features"))
-                .addAllSystemSupportedLocale(getList("Locales"))
-                .setGlEsVersion(getInt("GL.Version"))
-                .addAllGlExtension(getList("GL.Extensions"))
-                .addAllDeviceFeature(getDeviceFeatures())
-                .build()
+    @Transient
+    override val deviceConfigurationProto: DeviceConfigurationProto = DeviceConfigurationProto.newBuilder()
+            .setTouchScreen(getInt("TouchScreen"))
+            .setKeyboard(getInt("Keyboard"))
+            .setNavigation(getInt("Navigation"))
+            .setScreenLayout(getInt("ScreenLayout"))
+            .setHasHardKeyboard(properties.getProperty("HasHardKeyboard").toBoolean())
+            .setHasFiveWayNavigation(properties.getProperty("HasFiveWayNavigation").toBoolean())
+            .setLowRamDevice(properties.getProperty("LowRamDevice", "0").toInt())
+            .setMaxNumOfCPUCores(properties.getProperty("MaxNumOfCPUCores", "8").toInt())
+            .setTotalMemoryBytes(properties.getProperty("TotalMemoryBytes", "8589935000").toLong())
+            .setDeviceClass(0)
+            .setScreenDensity(getInt("Screen.Density"))
+            .setScreenWidth(getInt("Screen.Width"))
+            .setScreenHeight(getInt("Screen.Height"))
+            .addAllNativePlatform(getList("Platforms"))
+            .addAllSystemSharedLibrary(getList("SharedLibraries"))
+            .addAllSystemAvailableFeature(getList("Features"))
+            .addAllSystemSupportedLocale(getList("Locales"))
+            .setGlEsVersion(getInt("GL.Version"))
+            .addAllGlExtension(getList("GL.Extensions"))
+            .addAllDeviceFeature(getDeviceFeatures())
+            .build()
 
     private fun getInt(key: String): Int {
         return try {
@@ -141,6 +141,7 @@ class DeviceInfoProvider(var properties: Properties, var localeString: String) :
             }
             properties["Vending.versionString"] = vendingVersionString
         }
+
         if (properties.containsKey("Build.FINGERPRINT") && (!properties.containsKey("Build.ID")
                         || !properties.containsKey("Build.VERSION.RELEASE"))) {
             val fingerprint = properties.getProperty("Build.FINGERPRINT").split("/".toRegex()).toTypedArray()
@@ -171,6 +172,7 @@ class DeviceInfoProvider(var properties: Properties, var localeString: String) :
     }
 
     companion object {
+        @Transient
         private val requiredFields = arrayOf(
                 "UserReadableName",
                 "Build.HARDWARE",
