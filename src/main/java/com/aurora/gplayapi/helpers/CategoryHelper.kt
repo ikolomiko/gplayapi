@@ -70,7 +70,7 @@ class CategoryHelper private constructor(authData: AuthData) : BaseHelper(authDa
         category.title = subItem.title
         category.imageUrl = subItem.getImage(0).imageUrl
         category.color = subItem.getImage(0).fillColorRGB
-        category.homeUrl = subItem.annotations.annotationLink.resolvedLink.homeUrl
+        category.browseUrl = subItem.annotations.annotationLink.resolvedLink.browseUrl
         category.type = type
         return category
     }

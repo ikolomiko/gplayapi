@@ -18,7 +18,7 @@ package com.aurora.gplayapi.data.models
 class Category {
     var title: String = String()
     var imageUrl: String = String()
-    var homeUrl: String = String()
+    var browseUrl: String = String()
     var color: String = String()
     var type: Type = Type.APPLICATION
 
