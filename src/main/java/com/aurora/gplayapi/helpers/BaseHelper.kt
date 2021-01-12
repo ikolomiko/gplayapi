@@ -230,10 +230,12 @@ abstract class BaseHelper(protected var authData: AuthData) {
         var streamBundle = StreamBundle()
 
         if (responseWrapper.preFetchCount > 0) {
-            val preFetch = responseWrapper.getPreFetch(0)
-            if (preFetch.hasResponse() && preFetch.response.hasPayload()) {
-                val payload = preFetch.response.payload
-                streamBundle = getSubCategoryBundle(payload)
+            responseWrapper.preFetchList.forEach {
+                if (it.hasResponse() && it.response.hasPayload()) {
+                    val payload = it.response.payload
+                    val currentStreamBundle = getSubCategoryBundle(payload)
+                    streamBundle.streamClusters.putAll(currentStreamBundle.streamClusters)
+                }
             }
         } else if (responseWrapper.hasPayload()) {
             val payload = responseWrapper.payload
