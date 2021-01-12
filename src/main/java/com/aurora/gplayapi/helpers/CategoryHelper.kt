@@ -20,7 +20,7 @@ import com.aurora.gplayapi.Item
 import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.Category
-import com.aurora.gplayapi.data.models.subcategory.SubCategoryBundle
+import com.aurora.gplayapi.data.models.StreamBundle
 import com.aurora.gplayapi.data.providers.HeaderProvider
 import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
@@ -59,10 +59,10 @@ class CategoryHelper private constructor(authData: AuthData) : BaseHelper(authDa
     }
 
     @Throws(Exception::class)
-    fun getSubCategoryCluster(homeUrl: String): SubCategoryBundle? {
+    fun getSubCategoryBundle(homeUrl: String): StreamBundle {
         val headers = HeaderProvider.getDefaultHeaders(authData)
         val playResponse = httpClient.get(GooglePlayApi.URL_FDFE + "/" + homeUrl, headers)
-        return getSubCategoryCluster(playResponse.responseBytes)
+        return getSubCategoryBundle(playResponse.responseBytes)
     }
 
     private fun getCategoryFromItem(type: Category.Type, subItem: Item): Category {

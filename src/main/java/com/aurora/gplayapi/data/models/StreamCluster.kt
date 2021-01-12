@@ -15,8 +15,6 @@
 
 package com.aurora.gplayapi.data.models
 
-import java.util.*
-
 class StreamCluster {
     var id: Int = -1
     var clusterTitle: String = String()

@@ -20,8 +20,6 @@ import com.aurora.gplayapi.data.builders.AppBuilder.build
 import com.aurora.gplayapi.data.models.*
 import com.aurora.gplayapi.data.models.editor.EditorChoiceBundle
 import com.aurora.gplayapi.data.models.editor.EditorChoiceCluster
-import com.aurora.gplayapi.data.models.subcategory.SubCategoryBundle
-import com.aurora.gplayapi.data.models.subcategory.SubCategoryCluster
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.DefaultHttpClient
 import com.aurora.gplayapi.network.IHttpClient
@@ -217,50 +215,32 @@ abstract class BaseHelper(protected var authData: AuthData) {
     }
 
     /*------------------------------------- SUBCATEGORY STREAMS & BUNDLES ------------------------------------*/
-    fun getSubCategoryCluster(item: Item): SubCategoryCluster {
-        val title = if (item.hasTitle()) item.title else String()
-        val subCategoryCluster = SubCategoryCluster()
-        subCategoryCluster.title = title
-        subCategoryCluster.browseUrl = getBrowseUrl(item)
-        subCategoryCluster.nextPageUrl = getNextPageUrl(item)
-        subCategoryCluster.appList = getAppsFromItem(item)
-        return subCategoryCluster
-    }
 
-    fun getSubCategoryBundle(payload: Payload): SubCategoryBundle {
-        var nextPageUrl = String()
-        val subCategoryClusters: MutableList<SubCategoryCluster> = ArrayList()
+    fun getSubCategoryBundle(payload: Payload): StreamBundle {
+        var streamBundle = StreamBundle()
         if (payload.hasListResponse() && payload.listResponse.itemCount > 0) {
-            val item = payload.listResponse.getItem(0)
-            if (item != null) {
-                if (item.subItemCount > 0) {
-                    for (subItem in item.subItemList) {
-                        subCategoryClusters.add(getSubCategoryCluster(subItem))
-                    }
-                }
-                nextPageUrl = getNextPageUrl(item)
-            }
+            streamBundle = getStreamBundle(payload.listResponse)
         }
-        val subCategoryBundle = SubCategoryBundle()
-        subCategoryBundle.subCategoryClusters = subCategoryClusters
-        subCategoryBundle.nextPageUrl = nextPageUrl
-        return subCategoryBundle
+        return streamBundle
     }
 
     @Throws(Exception::class)
-    fun getSubCategoryCluster(bytes: ByteArray?): SubCategoryBundle? {
+    fun getSubCategoryBundle(bytes: ByteArray?): StreamBundle {
         val responseWrapper = ResponseWrapper.parseFrom(bytes)
+        var streamBundle = StreamBundle()
+
         if (responseWrapper.preFetchCount > 0) {
             val preFetch = responseWrapper.getPreFetch(0)
             if (preFetch.hasResponse() && preFetch.response.hasPayload()) {
                 val payload = preFetch.response.payload
-                return getSubCategoryBundle(payload)
+                streamBundle = getSubCategoryBundle(payload)
             }
         } else if (responseWrapper.hasPayload()) {
             val payload = responseWrapper.payload
-            return getSubCategoryBundle(payload)
+            streamBundle = getSubCategoryBundle(payload)
         }
-        return null
+
+        return streamBundle
     }
 
     /*------------------------------------- EDITOR'S CHOICE CLUSTER & BUNDLES ------------------------------------*/
@@ -299,7 +279,7 @@ abstract class BaseHelper(protected var authData: AuthData) {
         if (item.imageCount > 0) {
             item.imageList.forEach {
                 artworkList.add(Artwork().apply {
-                    type =  it.imageType
+                    type = it.imageType
                     url = it.imageUrl
                     aspectRatio = it.dimension.aspectRatio
                     width = it.dimension.width
