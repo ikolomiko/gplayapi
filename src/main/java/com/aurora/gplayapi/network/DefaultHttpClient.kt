@@ -40,7 +40,7 @@ object DefaultHttpClient : IHttpClient {
         return buildPlayResponse(response, request)
     }
 
-    override fun getX(
+    override fun get(
             url: String,
             headers: Map<String, String>,
             paramString: String
@@ -49,6 +49,20 @@ object DefaultHttpClient : IHttpClient {
                 .header(headers)
                 .response()
         return buildPlayResponse(response, request)
+    }
+
+    override fun getAuth(url: String): PlayResponse {
+        return PlayResponse().apply {
+            isSuccessful = false
+            code = 444
+        }
+    }
+
+    override fun postAuth(url: String, body: ByteArray): PlayResponse {
+        return PlayResponse().apply {
+            isSuccessful = false
+            code = 444
+        }
     }
 
     override fun post(url: String, headers: Map<String, String>, body: ByteArray): PlayResponse {

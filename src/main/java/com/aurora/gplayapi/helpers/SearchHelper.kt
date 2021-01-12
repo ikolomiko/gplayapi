@@ -63,7 +63,7 @@ class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData
                 5,
                 2 /*Text Entry*/,
                 3 /*Item Doc Id : 3 -> Apps*/)
-        val responseBody = httpClient.getX(GooglePlayApi.URL_SEARCH_SUGGEST, header, paramString)
+        val responseBody = httpClient.get(GooglePlayApi.URL_SEARCH_SUGGEST, header, paramString)
         val searchSuggestResponse = getSearchSuggestResponseFromBytes(responseBody.responseBytes)
         return if (searchSuggestResponse != null && searchSuggestResponse.entryCount > 0) {
             searchSuggestResponse.entryList

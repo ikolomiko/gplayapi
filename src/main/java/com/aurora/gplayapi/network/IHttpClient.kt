@@ -32,5 +32,11 @@ interface IHttpClient {
     fun get(url: String, headers: Map<String, String>, params: Map<String, String>): PlayResponse
 
     @Throws(IOException::class)
-    fun getX(url: String, headers: Map<String, String>, paramString: String): PlayResponse
+    fun get(url: String, headers: Map<String, String>, paramString: String): PlayResponse
+
+    @Throws(IOException::class)
+    fun getAuth(url: String): PlayResponse
+
+    @Throws(IOException::class)
+    fun postAuth(url: String, body: ByteArray): PlayResponse
 }
