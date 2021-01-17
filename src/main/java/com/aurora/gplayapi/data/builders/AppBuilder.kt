@@ -18,9 +18,9 @@ package com.aurora.gplayapi.data.builders
 import com.aurora.gplayapi.*
 import com.aurora.gplayapi.data.builders.ReviewBuilder.build
 import com.aurora.gplayapi.data.models.App
-import com.aurora.gplayapi.data.models.Artwork
+import com.aurora.gplayapi.data.models.details.Badge
+import com.aurora.gplayapi.data.models.File
 import com.aurora.gplayapi.data.models.Rating
-import java.util.*
 
 object AppBuilder {
 
@@ -32,6 +32,7 @@ object AppBuilder {
         if (detailsResponse.hasUserReview()) {
             app.userReview = build(detailsResponse.userReview)
         }
+
         return app
     }
 
@@ -51,10 +52,6 @@ object AppBuilder {
             app.price = item.getOffer(0).formattedAmount
         }
 
-        fillOfferDetails(app, item)
-        fillAggregateRating(app, item.aggregateRating)
-
-        app.fileMetadataList = appDetails.fileList
         app.packageName = appDetails.packageName
         app.versionName = appDetails.versionString
         app.versionCode = appDetails.versionCode
@@ -71,13 +68,12 @@ object AppBuilder {
         app.testingProgramAvailable = appDetails.hasTestingProgramInfo()
         app.labeledRating = item.aggregateRating.ratingLabel
         app.developerName = appDetails.developerName
-        if (item.creator.isNotEmpty())
-            app.developerName = item.creator
         app.developerEmail = appDetails.developerEmail
         app.developerAddress = appDetails.developerAddress
         app.developerWebsite = appDetails.developerWebsite
 
-        if (app.developerName.isNotEmpty()) app.developerName = item.creator
+        if (app.developerName.isNotEmpty())
+            app.developerName = item.creator
 
         if (appDetails.hasInstantLink && appDetails.instantLink!!.isNotEmpty()) {
             app.instantAppLink = appDetails.instantLink
@@ -88,13 +84,74 @@ object AppBuilder {
             app.testingProgramEmail = appDetails.testingProgramInfo.testingProgramEmail
         }
 
-        fillArtwork(app, item.imageList)
-        fillDependencies(app, appDetails)
-        fillOfferDetails(app, item)
+        parseAppInfo(app, item)
+        parseDisplayBadges(app,item)
+        parseInfoBadges(app,item)
+        parseAppRating(app, item.aggregateRating)
+        parseArtwork(app, item.imageList)
+        parseDependencies(app, appDetails)
+        parseFiles(app, appDetails)
         return app
     }
 
-    private fun fillAggregateRating(app: App, aggregateRating: AggregateRating) {
+    private fun parseDisplayBadges(app: App, item: Item) {
+        item.annotations?.let { annotations ->
+            annotations.displayBadgeList?.let { badges ->
+                badges.forEach {
+                    app.displayBadges.add(
+                            Badge().apply {
+                                textMajor = it.major
+                                textMinor = it.minor
+                                textMinorHtml = it.minorHtml
+                                textDescription = it.description
+                                artwork = DetailsBuilder.build(it.image)
+                                link = it.link.toString()
+                            }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun parseInfoBadges(app: App, item: Item) {
+        item.annotations?.let { annotations ->
+            annotations.infoBadgeList?.let { badges ->
+                badges.forEach {
+                    app.infoBadges.add(DetailsBuilder.build(it))
+                }
+            }
+
+            annotations.badgeForLegacyRating?.let {
+                app.infoBadges.add(DetailsBuilder.build(it))
+            }
+        }
+    }
+
+    private fun parseFiles(app: App, appDetails: AppDetails) {
+        app.fileList = appDetails.fileList
+                .map {
+                    var fileType = File.FileType.BASE
+                    var fileName = "${app.packageName}.${app.versionCode}.apk"
+
+                    if (it.hasSplitId()) {
+                        fileType = File.FileType.SPLIT
+                        fileName = "${it.splitId}.${app.versionCode}.apk"
+                    } else {
+                        if (it.fileType == 1) {
+                            fileName = "${app.packageName}.${app.versionCode}.obb"
+                            fileType = File.FileType.OBB
+                        }
+                    }
+                    File().apply {
+                        name = fileName
+                        type = fileType
+                        size = it.size
+                    }
+                }
+                .toMutableList()
+    }
+
+    private fun parseAppRating(app: App, aggregateRating: AggregateRating) {
         val rating = Rating(
                 aggregateRating.starRating,
                 aggregateRating.oneStarRatings,
@@ -110,37 +167,40 @@ object AppBuilder {
         app.rating = rating
     }
 
-    private fun fillDependencies(app: App, appDetails: AppDetails) {
-        if (appDetails.dependencies.dependencyCount > 0) {
-            val dependencySet: MutableSet<String> = HashSet()
-            for (dependency in appDetails.dependencies.dependencyList) {
-                dependencySet.add(dependency.packageName)
+    private fun parseDependencies(app: App, appDetails: AppDetails) {
+        if (appDetails.hasDependencies()) {
+            appDetails.dependencies.let {
+                app.dependencies.apply {
+                    it.dependencyList.forEach { dependency ->
+                        dependentPackages.add(dependency.packageName)
+                    }
+
+                    it.splitApksList.forEach { splitId ->
+                        dependentSplits.add(splitId)
+                    }
+
+                    totalSize = it.size
+                    targetSDK = it.targetSdk
+                }
             }
-            app.dependencies = dependencySet
         }
     }
 
-    private fun fillOfferDetails(app: App, item: Item) {
-        if (!item.hasProductDetails() || item.productDetails.sectionCount == 0) {
-            return
-        }
-        for (productDetailsSection in item.productDetails.sectionList) {
-            if (!productDetailsSection.hasContainer()) {
-                continue
+    private fun parseAppInfo(app: App, item: Item) {
+        if (item.hasAppInfo()) {
+            app.appInfo.apply {
+                item.appInfo.sectionList.forEach {
+                    if (it.hasLabel() && it.hasContainer() && it.container.hasDescription()) {
+                        appInfoMap[it.label] = it.container.description
+                    }
+                }
             }
-            app.offerDetails[productDetailsSection.label] = productDetailsSection.container.description
         }
     }
 
-    private fun fillArtwork(app: App, images: List<Image>) {
+    private fun parseArtwork(app: App, images: List<Image>) {
         for (image in images) {
-            val artwork = Artwork().apply {
-                type = image.imageType
-                url = image.imageUrl
-                aspectRatio = image.dimension.aspectRatio
-                width = image.dimension.width
-                height = image.dimension.height
-            }
+            val artwork = DetailsBuilder.build(image)
             when (image.imageType) {
                 Constants.IMAGE_TYPE_CATEGORY_ICON -> app.categoryArtwork = artwork
                 Constants.IMAGE_TYPE_APP_ICON -> app.iconArtwork = artwork

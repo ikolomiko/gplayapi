@@ -24,6 +24,17 @@ class Review {
     var rating: Int = 0
     var timeStamp: Long = 0L
 
+    override fun hashCode(): Int {
+        return userName.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            is Review -> other.userName == userName
+            else -> false
+        }
+    }
+
     enum class Filter(val value: String) {
         ALL("ALL"),
         POSITIVE("1"),

@@ -13,24 +13,15 @@
  *     GNU General Public License for more details.
  */
 
-package com.aurora.gplayapi.data.models
+package com.aurora.gplayapi.data.models.details
 
-class Artwork {
-    var type: Int = 0
-    var url: String = String()
-    var urlAlt: String = String()
-    var aspectRatio: Int = 0
-    var width: Int = 0
-    var height: Int = 0
+import com.aurora.gplayapi.data.models.Artwork
 
-    override fun hashCode(): Int {
-        return url.hashCode()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return when (other) {
-            is Artwork -> url == other.url
-            else -> false
-        }
-    }
+class Badge {
+    var textMajor: String = String()
+    var textMinor: String = String()
+    var textMinorHtml: String? = String()
+    var textDescription: String? = String()
+    var artwork: Artwork? = null
+    var link: String = String()
 }

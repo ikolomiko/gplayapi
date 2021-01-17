@@ -852,12 +852,12 @@ message DeviceConfigurationProto {
   optional int32 deviceClass = 16;
   optional int32 maxApkDownloadSizeMb = 17[default = 50];
   optional int32 smallestScreenWidthDP = 18;
-  optional int32 lowRamDevice = 19[default=0];
-  optional int64 totalMemoryBytes = 20[default=8354971648];
-  optional int32 maxNumOf_CPUCores = 21[default=8];
+  optional int32 lowRamDevice = 19[default = 0];
+  optional int64 totalMemoryBytes = 20[default = 8354971648];
+  optional int32 maxNumOf_CPUCores = 21[default = 8];
   repeated DeviceFeature deviceFeature = 26;
-  optional int32 unknown28 = 28[default=0];
-  optional int32 unknown30 = 30[default=4];
+  optional int32 unknown28 = 28[default = 0];
+  optional int32 unknown30 = 30[default = 4];
 }
 
 message DeviceFeature{
@@ -985,7 +985,7 @@ message AppDetails {
   repeated FileMetadata file = 17;
   optional string appType = 18;
   repeated string certificateHash = 19;
-  optional bool variesByAccount = 21 [default = true];
+  optional bool variesWithDevice = 21 [default = true];
   repeated CertificateSet certificateSet = 22;
   repeated string autoAcquireFreeAppIfHigherVersionAvailableTag = 23;
   optional bool hasInstantLink = 24;
@@ -1007,6 +1007,7 @@ message AppDetails {
   optional string categoryName = 48;
   optional int64 downloadCount = 53;
   optional string downloadLabelDisplay = 61;
+  optional string inAppProduct = 67;
   optional string downloadLabelAbbreviated = 77;
   optional string downloadLabel = 78;
 }
@@ -1126,7 +1127,7 @@ message Item {
   optional string subtitle = 22;
   optional string translatedDescriptionHtml = 23;
   optional bytes serverLogsCookie = 24;
-  optional ProductDetails productDetails = 25;
+  optional AppInfo appInfo = 25;
   optional bool mature = 26;
   optional string promotionalDescription = 27;
   optional bool availableForPreregistration = 29;
@@ -1138,17 +1139,17 @@ message Item {
   optional string reviewSummaryUrl = 39;
 }
 
-message ProductDetails {
+message AppInfo {
   optional string title = 1;
-  repeated ProductDetailsSection section = 2;
+  repeated AppInfoSection section = 2;
 }
 
-message ProductDetailsSection {
+message AppInfoSection {
   optional string label = 1;
-  optional ProductDetailsDescription container = 3;
+  optional AppInfoContainer container = 3;
 }
 
-message ProductDetailsDescription {
+message AppInfoContainer {
   optional Image image = 1;
   optional string description = 2;
 }
@@ -1160,7 +1161,7 @@ message Annotations {
   optional SectionMetaData sectionBodyOfWork = 5;
   optional SectionMetaData sectionCoreContent = 6;
   repeated Badge badgeForCreator = 8;
-  repeated Badge badgeForItem = 9;
+  repeated Badge infoBadge = 9;
   optional AnnotationLink annotationLink = 10;
   optional SectionMetaData sectionCrossSell = 11;
   optional SectionMetaData sectionRelatedItemType = 12;
@@ -1175,7 +1176,7 @@ message Annotations {
   repeated OverflowLink overflowLink = 25;
   optional string attributionHtml = 27;
   optional PurchaseHistoryDetails purchaseHistoryDetails = 28;
-  optional Badge badgeForContentRating = 29;
+  optional Badge badgeForLegacyRating = 29;
   repeated VoucherInfo voucherInfo = 30;
   optional SectionMetaData sectionFeaturedApps = 32;
   repeated SectionMetaData detailsPageCluster = 34;
@@ -1186,12 +1187,13 @@ message Annotations {
   repeated Badge featureBadge = 39;
   optional Snippet snippet = 42;
   optional string downloadsLabel = 48;
+  optional Badge badgeForRating = 50;
   optional CategoryInfo categoryInfo = 53;
   optional string reasons = 60;
   optional Stream topChartStream = 65;
   optional string categoryName = 66;
   repeated Chip chips = 71;
-  repeated BadgeInfo badgeInfo = 72;
+  repeated Badge displayBadge = 72;
   optional string liveStreamUrl = 80;
   optional string promotionUrl = 85;
   optional SubStream categoryStream = 97;
@@ -1308,25 +1310,17 @@ message SectionMetaData {
 }
 
 message Badge {
-  optional string title = 1;
-  repeated Image image = 2;
-  optional string browseUrl = 3;
-  optional string description = 4;
-  optional string textInTitleSection = 5;
-  optional Image expandedBadgeImage = 6;
-}
-
-message BadgeInfo {
-  optional string title = 1;
+  optional string major = 1;
   optional Image image = 2;
-  optional string subtitle = 3;
-  optional BadgeSubInfo badgeSubInfo = 6;
+  optional string minor = 3;
+  optional string minorHtml = 4;
+  optional SubBadge subBadge = 6;
   optional StreamLink link = 7;
   optional string description = 8;
   optional SubStream stream = 12;
 }
 
-message BadgeSubInfo {
+message SubBadge {
   optional Image image = 1;
   optional string description = 4;
   optional StreamLink link = 5;
@@ -1862,7 +1856,7 @@ message ReviewResponse {
   optional GetReviewsResponse userReviewsResponse = 1;
   optional string nextPageUrl = 2;
   optional Review userReview = 3;
-  optional string suggestions_list_url = 4;
+  optional string suggestionsListUrl = 4;
   optional CriticReviewsResponse criticReviewsResponse = 5;
 }
 
@@ -1941,7 +1935,7 @@ message UploadDeviceConfigResponse {
 
 message AndroidCheckinRequest {
   optional string imei = 1;
-  optional int64 id = 2[default=0];
+  optional int64 id = 2[default = 0];
   optional string digest = 3;
   optional AndroidCheckinProto checkin = 4;
   optional string desiredBuild = 5;
@@ -2092,7 +2086,7 @@ message IpLayerNetworkStat {
 message KeyToPackageNameMapping {
   optional int32 packageKey = 1;
   optional string uidName = 2;
-  repeated PackageInfo sharedPackageList = 3;
+  repeated PackageInfo sharedPackage = 3;
 }
 
 message PackageInfo {

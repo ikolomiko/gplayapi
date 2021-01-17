@@ -17,15 +17,20 @@ package com.aurora.gplayapi.data.models
 
 import com.aurora.gplayapi.Constants.Restriction
 import com.aurora.gplayapi.Features
-import com.aurora.gplayapi.FileMetadata
+import com.aurora.gplayapi.data.models.details.AppInfo
+import com.aurora.gplayapi.data.models.details.Badge
+import com.aurora.gplayapi.data.models.details.Dependencies
 
 class App(var packageName: String) {
     var id: Int = 0
+    var appInfo: AppInfo = AppInfo()
+    var displayBadges: MutableList<Badge> = mutableListOf()
+    var infoBadges: MutableList<Badge> = mutableListOf()
     var screenshots: MutableList<Artwork> = mutableListOf()
     var permissions: MutableList<String> = mutableListOf()
     var offerDetails: MutableMap<String, String> = mutableMapOf()
     var relatedLinks: MutableMap<String, String> = mutableMapOf()
-    var dependencies: MutableSet<String> = mutableSetOf()
+    var dependencies: Dependencies = Dependencies()
     var categoryArtwork: Artwork = Artwork()
     var categoryId: String = String()
     var categoryName: String = String()
@@ -53,7 +58,7 @@ class App(var packageName: String) {
     var inPlayStore = false
     var isFree = false
     var isInstalled = false
-    var system = false
+    var isSystem = false
     var testingProgramAvailable = false
     var testingProgramOptedIn = false
     var offerType = 0
@@ -63,15 +68,12 @@ class App(var packageName: String) {
     var rating: Rating = Rating()
     var restriction: Restriction = Restriction.NOT_RESTRICTED
 
-    @Transient
     var userReview: Review = Review()
 
     @Transient
     var features: Features? = null
 
-    @Transient
-    var fileMetadataList: List<FileMetadata> = ArrayList()
-    var fileList: List<File> = ArrayList()
+    var fileList: MutableList<File> = mutableListOf()
 
     override fun hashCode(): Int {
         return packageName.hashCode()
