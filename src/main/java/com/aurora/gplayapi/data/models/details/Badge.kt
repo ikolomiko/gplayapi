@@ -16,12 +16,25 @@
 package com.aurora.gplayapi.data.models.details
 
 import com.aurora.gplayapi.data.models.Artwork
+import java.util.*
 
 class Badge {
+    var id: String = UUID.randomUUID().toString()
     var textMajor: String = String()
     var textMinor: String = String()
     var textMinorHtml: String? = String()
     var textDescription: String? = String()
     var artwork: Artwork? = null
     var link: String = String()
+
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            is Badge -> other.id == id
+            else -> false
+        }
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
 }
