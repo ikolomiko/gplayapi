@@ -77,7 +77,7 @@ object AppBuilder {
         app.developerWebsite = appDetails.developerWebsite
         app.targetSdk = appDetails.targetSdkVersion
 
-        if (app.developerName.isNotEmpty())
+        if (app.developerName.isEmpty())
             app.developerName = item.creator
 
         appDetails.instantLink?.let {
