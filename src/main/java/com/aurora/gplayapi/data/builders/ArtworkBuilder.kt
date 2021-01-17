@@ -17,10 +17,8 @@ package com.aurora.gplayapi.data.builders
 
 import com.aurora.gplayapi.Image
 import com.aurora.gplayapi.data.models.Artwork
-import com.aurora.gplayapi.data.models.details.Badge
 
-object DetailsBuilder {
-
+object ArtworkBuilder {
     fun build(image: Image): Artwork {
         return Artwork().apply {
             type = image.imageType
@@ -29,17 +27,6 @@ object DetailsBuilder {
             aspectRatio = image.dimension.aspectRatio
             width = image.dimension.width
             height = image.dimension.height
-        }
-    }
-
-    fun build(badge: com.aurora.gplayapi.Badge): Badge {
-        return Badge().apply {
-            textMajor = badge.major
-            textMinor = badge.minor
-            textMinorHtml = badge.minorHtml
-            textDescription = badge.description
-            artwork = build(badge.image)
-            link = badge.link.toString()
         }
     }
 }

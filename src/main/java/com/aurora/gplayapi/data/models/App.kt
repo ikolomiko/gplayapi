@@ -16,64 +16,61 @@
 package com.aurora.gplayapi.data.models
 
 import com.aurora.gplayapi.Constants.Restriction
-import com.aurora.gplayapi.Features
 import com.aurora.gplayapi.data.models.details.AppInfo
 import com.aurora.gplayapi.data.models.details.Badge
 import com.aurora.gplayapi.data.models.details.Dependencies
+import com.aurora.gplayapi.data.models.details.TestingProgram
 
 class App(var packageName: String) {
     var id: Int = 0
     var appInfo: AppInfo = AppInfo()
-    var displayBadges: MutableList<Badge> = mutableListOf()
-    var infoBadges: MutableList<Badge> = mutableListOf()
-    var screenshots: MutableList<Artwork> = mutableListOf()
-    var permissions: MutableList<String> = mutableListOf()
-    var offerDetails: MutableMap<String, String> = mutableMapOf()
-    var relatedLinks: MutableMap<String, String> = mutableMapOf()
-    var dependencies: Dependencies = Dependencies()
     var categoryArtwork: Artwork = Artwork()
-    var categoryId: String = String()
+    var categoryId: Int = 0
     var categoryName: String = String()
+    var categoryStreamUrl: String? = String()
     var changes: String = String()
+    var containsAds = false
+    var coverArtwork: Artwork = Artwork()
+    var dependencies: Dependencies = Dependencies()
     var description: String = String()
-    var developerName: String = String()
-    var developerEmail: String = String()
     var developerAddress: String = String()
+    var developerEmail: String = String()
+    var developerName: String = String()
     var developerWebsite: String = String()
+    var displayBadges: MutableList<Badge> = mutableListOf()
     var displayName: String = String()
     var downloadString: String = String()
+    var earlyAccess = false
+    var fileList: MutableList<File> = mutableListOf()
     var footerHtml: String = String()
     var iconArtwork: Artwork = Artwork()
-    var coverArtwork: Artwork = Artwork()
-    var instantAppLink: String = String()
-    var labeledRating: String = String()
-    var price: String = String()
-    var shortDescription: String = String()
-    var testingProgramEmail: String = String()
-    var updated: String = String()
-    var versionName: String = String()
-    var videoArtwork: Artwork = Artwork()
-    var containsAds = false
-    var earlyAccess = false
+    var infoBadges: MutableList<Badge> = mutableListOf()
     var inPlayStore = false
+    var installs: Long = 0
+    var instantAppLink: String = String()
     var isFree = false
     var isInstalled = false
     var isSystem = false
-    var testingProgramAvailable = false
-    var testingProgramOptedIn = false
+    var labeledRating: String = String()
+    var liveStreamUrl: String? = String()
+    var offerDetails: MutableMap<String, String> = mutableMapOf()
     var offerType = 0
-    var versionCode: Int = 0
-    var installs: Long = 0
-    var size: Long = 0
+    var permissions: MutableList<String> = mutableListOf()
+    var price: String = String()
+    var promotionStreamUrl: String? = String()
     var rating: Rating = Rating()
+    var relatedLinks: MutableMap<String, String> = mutableMapOf()
     var restriction: Restriction = Restriction.NOT_RESTRICTED
-
+    var screenshots: MutableList<Artwork> = mutableListOf()
+    var shareUrl: String = String()
+    var shortDescription: String = String()
+    var size: Long = 0
+    var targetSdk: Int = 21
+    var testingProgram = TestingProgram()
     var userReview: Review = Review()
-
-    @Transient
-    var features: Features? = null
-
-    var fileList: MutableList<File> = mutableListOf()
+    var versionCode: Int = 0
+    var versionName: String = String()
+    var videoArtwork: Artwork = Artwork()
 
     override fun hashCode(): Int {
         return packageName.hashCode()

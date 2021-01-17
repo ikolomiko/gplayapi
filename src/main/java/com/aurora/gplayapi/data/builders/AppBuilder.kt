@@ -15,22 +15,27 @@
 
 package com.aurora.gplayapi.data.builders
 
-import com.aurora.gplayapi.*
-import com.aurora.gplayapi.data.builders.ReviewBuilder.build
+import com.aurora.gplayapi.AppDetails
+import com.aurora.gplayapi.Constants
+import com.aurora.gplayapi.DetailsResponse
+import com.aurora.gplayapi.Item
 import com.aurora.gplayapi.data.models.App
-import com.aurora.gplayapi.data.models.details.Badge
 import com.aurora.gplayapi.data.models.File
-import com.aurora.gplayapi.data.models.Rating
+import com.aurora.gplayapi.data.models.details.Badge
 
 object AppBuilder {
 
     fun build(detailsResponse: DetailsResponse): App {
-        val app = build(detailsResponse.item)
-        app.footerHtml = if (detailsResponse.footerHtml.isNotBlank()) detailsResponse.footerHtml else String()
-        app.features = detailsResponse.features
+        val item = detailsResponse.item
+        val app = build(item)
+
+        app.footerHtml = if (detailsResponse.footerHtml.isNotBlank())
+            detailsResponse.footerHtml
+        else
+            String()
 
         if (detailsResponse.hasUserReview()) {
-            app.userReview = build(detailsResponse.userReview)
+            app.userReview = ReviewBuilder.build(detailsResponse.userReview)
         }
 
         return app
@@ -40,10 +45,11 @@ object AppBuilder {
         val appDetails = item.details.appDetails
         val app = App(appDetails.packageName)
         app.id = appDetails.packageName.hashCode()
+        app.categoryId = item.categoryId
         app.displayName = item.title
         app.description = item.descriptionHtml
         app.shortDescription = item.promotionalDescription
-        app.categoryId = item.annotations.categoryInfo.appCategory
+        app.shareUrl = item.shareUrl
         app.restriction = Constants.Restriction.forInt(item.availability.restriction)
 
         if (item.offerCount > 0) {
@@ -56,41 +62,39 @@ object AppBuilder {
         app.versionName = appDetails.versionString
         app.versionCode = appDetails.versionCode
         app.categoryName = appDetails.categoryName
-        app.size = appDetails.installationSize
+        app.size = appDetails.infoDownloadSize
         app.installs = appDetails.downloadCount
         app.downloadString = appDetails.downloadLabelAbbreviated
-        app.updated = appDetails.uploadDate
         app.changes = appDetails.recentChangesHtml
         app.permissions = appDetails.permissionList
         app.containsAds = appDetails.hasInstallNotes()
         app.inPlayStore = true
         app.earlyAccess = appDetails.hasEarlyAccessInfo()
-        app.testingProgramAvailable = appDetails.hasTestingProgramInfo()
         app.labeledRating = item.aggregateRating.ratingLabel
         app.developerName = appDetails.developerName
         app.developerEmail = appDetails.developerEmail
         app.developerAddress = appDetails.developerAddress
         app.developerWebsite = appDetails.developerWebsite
+        app.targetSdk = appDetails.targetSdkVersion
 
         if (app.developerName.isNotEmpty())
             app.developerName = item.creator
 
-        if (appDetails.hasInstantLink && appDetails.instantLink!!.isNotEmpty()) {
-            app.instantAppLink = appDetails.instantLink
-        }
-
-        if (app.testingProgramAvailable) {
-            app.testingProgramOptedIn = appDetails.testingProgramInfo.subscribed
-            app.testingProgramEmail = appDetails.testingProgramInfo.testingProgramEmail
+        appDetails.instantLink?.let {
+            app.instantAppLink = it
         }
 
         parseAppInfo(app, item)
-        parseDisplayBadges(app,item)
-        parseInfoBadges(app,item)
-        parseAppRating(app, item.aggregateRating)
-        parseArtwork(app, item.imageList)
+        parseDisplayBadges(app, item)
+        parseInfoBadges(app, item)
+        parseStreamUrls(app, item)
+        parseRating(app, item)
+        parseArtwork(app, item)
+
         parseDependencies(app, appDetails)
         parseFiles(app, appDetails)
+        parseTestingProgram(app, appDetails)
+
         return app
     }
 
@@ -104,7 +108,7 @@ object AppBuilder {
                                 textMinor = it.minor
                                 textMinorHtml = it.minorHtml
                                 textDescription = it.description
-                                artwork = DetailsBuilder.build(it.image)
+                                artwork = ArtworkBuilder.build(it.image)
                                 link = it.link.toString()
                             }
                     )
@@ -117,12 +121,12 @@ object AppBuilder {
         item.annotations?.let { annotations ->
             annotations.infoBadgeList?.let { badges ->
                 badges.forEach {
-                    app.infoBadges.add(DetailsBuilder.build(it))
+                    app.infoBadges.add(BadgeBuilder.build(it))
                 }
             }
 
             annotations.badgeForLegacyRating?.let {
-                app.infoBadges.add(DetailsBuilder.build(it))
+                app.infoBadges.add(BadgeBuilder.build(it))
             }
         }
     }
@@ -151,20 +155,8 @@ object AppBuilder {
                 .toMutableList()
     }
 
-    private fun parseAppRating(app: App, aggregateRating: AggregateRating) {
-        val rating = Rating(
-                aggregateRating.starRating,
-                aggregateRating.oneStarRatings,
-                aggregateRating.twoStarRatings,
-                aggregateRating.threeStarRatings,
-                aggregateRating.fourStarRatings,
-                aggregateRating.fiveStarRatings,
-                aggregateRating.thumbsUpCount,
-                aggregateRating.thumbsDownCount,
-                aggregateRating.ratingLabel,
-                aggregateRating.ratingCountLabelAbbreviated
-        )
-        app.rating = rating
+    private fun parseRating(app: App, item: Item) {
+        app.rating = RatingBuilder.build(item.aggregateRating)
     }
 
     private fun parseDependencies(app: App, appDetails: AppDetails) {
@@ -194,20 +186,32 @@ object AppBuilder {
                         appInfoMap[it.label] = it.container.description
                     }
                 }
+                appInfoMap["DOWNLOAD"] = item.details.appDetails.infoDownload
+                appInfoMap["UPDATED_ON"] = item.details.appDetails.infoUpdatedOn
             }
         }
     }
 
-    private fun parseArtwork(app: App, images: List<Image>) {
-        for (image in images) {
-            val artwork = DetailsBuilder.build(image)
+    private fun parseArtwork(app: App, item: Item) {
+        for (image in item.imageList) {
+            val artwork = ArtworkBuilder.build(image)
             when (image.imageType) {
                 Constants.IMAGE_TYPE_CATEGORY_ICON -> app.categoryArtwork = artwork
                 Constants.IMAGE_TYPE_APP_ICON -> app.iconArtwork = artwork
-                Constants.IMAGE_TYPE_YOUTUBE_VIDEO_LINK -> app.videoArtwork = artwork
+                Constants.IMAGE_TYPE_YOUTUBE_VIDEO_THUMBNAIL -> app.videoArtwork = artwork
                 Constants.IMAGE_TYPE_PLAY_STORE_PAGE_BACKGROUND -> app.coverArtwork = artwork
                 Constants.IMAGE_TYPE_APP_SCREENSHOT -> app.screenshots.add(artwork)
             }
         }
+    }
+
+    private fun parseStreamUrls(app: App, item: Item) {
+        app.categoryStreamUrl = item.annotations?.categoryStream?.link?.streamUrl
+        app.liveStreamUrl = item.annotations?.liveStreamUrl
+        app.promotionStreamUrl = item.annotations?.promotionStreamUrl
+    }
+
+    private fun parseTestingProgram(app: App, appDetails: AppDetails) {
+        app.testingProgram = TestingProgramBuilder.build(appDetails)
     }
 }

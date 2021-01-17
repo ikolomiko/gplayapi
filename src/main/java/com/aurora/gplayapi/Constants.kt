@@ -22,6 +22,7 @@ object Constants {
     const val IMAGE_TYPE_YOUTUBE_VIDEO_LINK = 3
     const val IMAGE_TYPE_APP_ICON = 4
     const val IMAGE_TYPE_CATEGORY_ICON = 5
+    const val IMAGE_TYPE_YOUTUBE_VIDEO_THUMBNAIL = 13
     const val IMAGE_TYPE_GOOGLE_PLUS_BACKGROUND = 15
 
     enum class ABUSE(var value: Int) {

@@ -15,24 +15,20 @@
 
 package com.aurora.gplayapi.data.builders
 
-import com.aurora.gplayapi.Constants
-import com.aurora.gplayapi.data.models.Review
+import com.aurora.gplayapi.AppDetails
+import com.aurora.gplayapi.data.models.details.TestingProgram
 
-object ReviewBuilder {
+object TestingProgramBuilder {
 
-    fun build(reviewProto: com.aurora.gplayapi.Review): Review {
-        return Review().apply {
-            comment = reviewProto.comment
-            title = reviewProto.title
-            rating = reviewProto.starRating
-            userName = reviewProto.userProfile.name
-            timeStamp = reviewProto.timestamp
-            appVersion = reviewProto.version
-
-            reviewProto.userProfile.imageList?.forEach {
-                if (it.imageType == Constants.IMAGE_TYPE_APP_ICON) {
-                    userPhotoUrl = it.imageUrl
-                }
+    fun build(appDetails: AppDetails): TestingProgram {
+        return TestingProgram().apply {
+            appDetails.testingProgramInfo?.let {
+                artwork = ArtworkBuilder.build(it.image)
+                displayName = it.displayName
+                email = it.email
+                isAvailable = true
+                isSubscribed = it.subscribed
+                isSubscribedAndInstalled = it.subscribedAndInstalled
             }
         }
     }

@@ -974,14 +974,14 @@ message AppDetails {
   optional string title = 5;
   repeated string appCategory = 7;
   optional int32 contentRating = 8;
-  optional int64 installationSize = 9;
+  optional int64 infoDownloadSize = 9;
   repeated string permission = 10;
   optional string developerEmail = 11;
   optional string developerWebsite = 12;
-  optional string downloadLabelLegacy = 13;
+  optional string infoDownload = 13;
   optional string packageName = 14;
   optional string recentChangesHtml = 15;
-  optional string uploadDate = 16;
+  optional string infoUpdatedOn = 16;
   repeated FileMetadata file = 17;
   optional string appType = 18;
   repeated string certificateHash = 19;
@@ -1051,8 +1051,8 @@ message Dependency {
 
 message TestingProgramInfo {
   optional bool subscribed = 2;
-  optional bool subscribed1 = 3;
-  optional string testingProgramEmail = 5;
+  optional bool subscribedAndInstalled = 3;
+  optional string email = 5;
   optional string displayName = 7;
   optional Image image = 6;
 }
@@ -1195,7 +1195,7 @@ message Annotations {
   repeated Chip chips = 71;
   repeated Badge displayBadge = 72;
   optional string liveStreamUrl = 80;
-  optional string promotionUrl = 85;
+  optional string promotionStreamUrl = 85;
   optional SubStream categoryStream = 97;
 }
 message SuggestionReasons {
