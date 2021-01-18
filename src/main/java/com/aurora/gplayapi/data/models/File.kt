@@ -15,7 +15,10 @@
 
 package com.aurora.gplayapi.data.models
 
+import java.util.*
+
 class File {
+    var id: String = UUID.randomUUID().toString()
     var name: String = String()
     var url: String = String()
     var size: Long = 0L
@@ -23,5 +26,16 @@ class File {
 
     enum class FileType {
         BASE, OBB, PATCH, SPLIT
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            is File -> other.id == id
+            else -> false
+        }
     }
 }
