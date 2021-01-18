@@ -16,10 +16,7 @@
 package com.aurora.gplayapi.data.models
 
 import com.aurora.gplayapi.Constants.Restriction
-import com.aurora.gplayapi.data.models.details.AppInfo
-import com.aurora.gplayapi.data.models.details.Badge
-import com.aurora.gplayapi.data.models.details.Dependencies
-import com.aurora.gplayapi.data.models.details.TestingProgram
+import com.aurora.gplayapi.data.models.details.*
 
 class App(var packageName: String) {
     var id: Int = 0
@@ -29,6 +26,7 @@ class App(var packageName: String) {
     var categoryName: String = String()
     var categoryStreamUrl: String? = String()
     var changes: String = String()
+    var chips:MutableList<Chip> = mutableListOf()
     var containsAds = false
     var coverArtwork: Artwork = Artwork()
     var dependencies: Dependencies = Dependencies()

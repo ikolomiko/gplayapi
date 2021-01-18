@@ -15,7 +15,21 @@
 
 package com.aurora.gplayapi.data.models.details
 
+import java.util.*
+
 class Chip {
+    var id: String = UUID.randomUUID().toString()
     var title: String = String()
-    var streamUrl: String = String()
+    var streamUrl: String? = String()
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            is Chip -> other.id == id
+            else -> false
+        }
+    }
 }

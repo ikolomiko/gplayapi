@@ -22,6 +22,7 @@ import com.aurora.gplayapi.Item
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.File
 import com.aurora.gplayapi.data.models.details.Badge
+import com.aurora.gplayapi.data.models.details.Chip
 
 object AppBuilder {
 
@@ -85,6 +86,7 @@ object AppBuilder {
         }
 
         parseAppInfo(app, item)
+        parseChips(app, item)
         parseDisplayBadges(app, item)
         parseInfoBadges(app, item)
         parseStreamUrls(app, item)
@@ -213,5 +215,16 @@ object AppBuilder {
 
     private fun parseTestingProgram(app: App, appDetails: AppDetails) {
         app.testingProgram = TestingProgramBuilder.build(appDetails)
+    }
+
+    private fun parseChips(app: App, item: Item) {
+        item.annotations.chipList?.forEach {
+            app.chips.add(
+                    Chip().apply {
+                        title = it.title
+                        streamUrl = it.stream?.link?.streamUrl
+                    }
+            )
+        }
     }
 }

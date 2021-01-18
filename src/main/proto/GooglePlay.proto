@@ -1192,7 +1192,7 @@ message Annotations {
   optional string reasons = 60;
   optional Stream topChartStream = 65;
   optional string categoryName = 66;
-  repeated Chip chips = 71;
+  repeated Chip chip = 71;
   repeated Badge displayBadge = 72;
   optional string liveStreamUrl = 80;
   optional string promotionStreamUrl = 85;
