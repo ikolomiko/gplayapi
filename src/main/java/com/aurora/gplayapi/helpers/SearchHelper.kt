@@ -16,6 +16,7 @@
 package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.*
+import com.aurora.gplayapi.data.builders.AppBuilder
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.PlayResponse
@@ -126,6 +127,10 @@ class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData
                     if (subItem.type == 45) {
                         if (subItem.title.isEmpty() || subItem.title == "Apps") {
                             appList.addAll(getAppsFromItem(subItem))
+                        } else {
+                            if (subItem.title.isNotEmpty())
+                                continue // Filter out `You Might Also Like` & `Related Apps`
+                            appList.add(AppBuilder.build(subItem))
                         }
                     }
                     searchBundle.subBundles.add(getSubBundle(subItem))
