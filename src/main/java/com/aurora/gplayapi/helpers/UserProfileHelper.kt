@@ -43,9 +43,14 @@ class UserProfileHelper private constructor(authData: AuthData) : BaseHelper(aut
         }
     }
 
-    fun getUserProfile():UserProfile{
-        return UserProfileBuilder.build(
-                getUserProfileResponse().userProfile
-        )
+    @Throws(Exception::class)
+    fun getUserProfile(): UserProfile? {
+        return try {
+            UserProfileBuilder.build(
+                    getUserProfileResponse().userProfile
+            )
+        } catch (e: Exception) {
+            null
+        }
     }
 }

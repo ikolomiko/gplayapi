@@ -43,4 +43,5 @@ class AuthData {
     var dfeCookie: String = String()
     var locale: Locale = Locale.getDefault()
     var deviceInfoProvider: DeviceInfoProvider? = null
+    var userProfile: UserProfile? = null
 }
