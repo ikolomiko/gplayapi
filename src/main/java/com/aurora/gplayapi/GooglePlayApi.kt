@@ -207,6 +207,7 @@ class GooglePlayApi(private val authData: AuthData) {
         const val URL_UPLOAD_DEVICE_CONFIG = "$URL_FDFE/uploadDeviceConfig"
         const val URL_SYNC = "$URL_FDFE/apps/contentSync"
         const val URL_SELF_UPDATE = "$URL_FDFE/selfUpdate"
+        const val URL_USER_PROFILE = "$URL_FDFE/api/userProfile"
 
         //Not part of Google's API
         const val SALES_URL = "https://www.bestappsale.com/api/android/getsale.php"

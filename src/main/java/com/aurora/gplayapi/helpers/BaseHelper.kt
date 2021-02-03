@@ -53,6 +53,12 @@ abstract class BaseHelper(protected var authData: AuthData) {
     }
 
     @Throws(Exception::class)
+    fun getUserProfileResponse(bytes: ByteArray?): PayloadApi {
+        val responseWrapper = ResponseWrapperApi.parseFrom(bytes)
+        return responseWrapper!!.payload
+    }
+
+    @Throws(Exception::class)
     fun getDetailsResponseFromBytes(bytes: ByteArray?): DetailsResponse {
         val payload = getPayLoadFromBytes(bytes)
         return payload.detailsResponse
