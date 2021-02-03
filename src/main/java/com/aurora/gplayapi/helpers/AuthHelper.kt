@@ -75,7 +75,7 @@ class AuthHelper {
             val tosResponse = api.toc()
 
             //Fetch UserProfile
-            authData.userProfile = UserProfileHelper.with(authData).getUserProfile()
+            authData.userProfile = UserProfileHelper(authData).getUserProfile()
 
             return authData
         }

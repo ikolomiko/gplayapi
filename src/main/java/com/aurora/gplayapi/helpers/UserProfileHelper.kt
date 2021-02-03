@@ -16,7 +16,6 @@
 package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.GooglePlayApi
-import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.UserProfileResponse
 import com.aurora.gplayapi.data.builders.UserProfileBuilder
 import com.aurora.gplayapi.data.models.AuthData
@@ -24,9 +23,7 @@ import com.aurora.gplayapi.data.models.UserProfile
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.IHttpClient
 
-class UserProfileHelper private constructor(authData: AuthData) : BaseHelper(authData) {
-
-    companion object : SingletonHolder<UserProfileHelper, AuthData>(::UserProfileHelper)
+class UserProfileHelper(authData: AuthData) : BaseHelper(authData) {
 
     override fun using(httpClient: IHttpClient) = apply {
         this.httpClient = httpClient
