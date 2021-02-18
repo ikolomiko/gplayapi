@@ -15,10 +15,11 @@
 
 package com.aurora.gplayapi
 
+import com.aurora.gplayapi.GooglePlayApi.Service.*
 import com.aurora.gplayapi.data.models.AuthData
-import com.aurora.gplayapi.data.providers.HeaderProvider.getAASTokenHeaders
 import com.aurora.gplayapi.data.providers.HeaderProvider.getAuthHeaders
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
+import com.aurora.gplayapi.data.providers.ParamProvider.getAASTokenParams
 import com.aurora.gplayapi.data.providers.ParamProvider.getAuthParams
 import com.aurora.gplayapi.data.providers.ParamProvider.getDefaultAuthParams
 import com.aurora.gplayapi.exceptions.AuthException
@@ -59,28 +60,28 @@ class GooglePlayApi(private val authData: AuthData) {
 
         val playResponse = httpClient.post(URL_TOS_ACCEPT, headers, params)
         return ResponseWrapper.parseFrom(playResponse.responseBytes)
-                .payload
-                .acceptTosResponse
+            .payload
+            .acceptTosResponse
     }
 
     @Throws(IOException::class)
     fun uploadDeviceConfig(): UploadDeviceConfigResponse {
         val request = UploadDeviceConfigRequest.newBuilder()
-                .setDeviceConfiguration(authData.deviceInfoProvider!!.deviceConfigurationProto)
-                .build()
+            .setDeviceConfiguration(authData.deviceInfoProvider!!.deviceConfigurationProto)
+            .build()
 
         val headers: MutableMap<String, String> = getDefaultHeaders(authData)
-
 
         val playResponse = httpClient.post(URL_UPLOAD_DEVICE_CONFIG, headers, request.toByteArray())
 
         val configResponse = ResponseWrapper.parseFrom(playResponse.responseBytes)
-                .payload
-                .uploadDeviceConfigResponse
+            .payload
+            .uploadDeviceConfigResponse
 
         if (configResponse.uploadDeviceConfigToken.isNotBlank()) {
             authData.deviceConfigToken = configResponse.uploadDeviceConfigToken
         }
+
         return configResponse
     }
 
@@ -107,7 +108,7 @@ class GooglePlayApi(private val authData: AuthData) {
     fun generateAASToken(oauthToken: String): String? {
         val params: MutableMap<String, String> = HashMap()
         params.putAll(getDefaultAuthParams(authData))
-        params.putAll(getAASTokenHeaders(oauthToken))
+        params.putAll(getAASTokenParams(oauthToken))
         val headers: MutableMap<String, String> = getAuthHeaders(authData)
         headers["app"] = "com.android.vending"
         val playResponse = httpClient.post(URL_AUTH, headers, params)
@@ -127,36 +128,38 @@ class GooglePlayApi(private val authData: AuthData) {
         params.putAll(getAuthParams(aasToken))
 
         when (service) {
-            Service.AC2DM -> {
+            AC2DM -> {
                 params["service"] = "ac2dm"
                 params.remove("app")
             }
-            Service.ANDROID_CHECK_IN_SERVER -> {
+            ANDROID_CHECK_IN_SERVER -> {
                 params["oauth2_foreground"] = "0"
                 params["app"] = "com.google.android.gms"
                 params["service"] = "AndroidCheckInServer"
             }
-            Service.EXPERIMENTAL_CONFIG -> params["service"] = "oauth2:https://www.googleapis.com/auth/experimentsandconfigs"
-            Service.NUMBERER -> {
+            EXPERIMENTAL_CONFIG -> {
+                params["service"] = "oauth2:https://www.googleapis.com/auth/experimentsandconfigs"
+            }
+            NUMBERER -> {
                 params["app"] = "com.google.android.gms"
                 params["service"] = "oauth2:https://www.googleapis.com/auth/numberer"
             }
-            Service.GCM -> {
+            GCM -> {
                 params["app"] = "com.google.android.gms"
                 params["service"] = "oauth2:https://www.googleapis.com/auth/gcm"
             }
-            Service.GOOGLE_PLAY -> {
+            GOOGLE_PLAY -> {
                 headers["app"] = "com.google.android.gms"
                 params["service"] = "oauth2:https://www.googleapis.com/auth/googleplay"
             }
-            Service.OAUTHLOGIN -> {
+            OAUTHLOGIN -> {
                 params["oauth2_foreground"] = "0"
                 params["app"] = "com.google.android.googlequicksearchbox"
                 params["service"] = "oauth2:https://www.google.com/accounts/OAuthLogin"
                 params["callerPkg"] = "com.google.android.googlequicksearchbox"
             }
-            else -> {
-
+            ANDROID -> {
+                params["service"] = "android"
             }
         }
 
@@ -164,9 +167,7 @@ class GooglePlayApi(private val authData: AuthData) {
         val hashMap = Util.parseResponse(playResponse.responseBytes)
 
         return if (hashMap.containsKey("Auth")) {
-            val token = hashMap["Auth"]
-            authData.authToken = token!!
-            token
+            hashMap.getOrDefault("Auth", "")
         } else {
             throw AuthException("Authentication failed : Could not generate OAuth Token")
         }

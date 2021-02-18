@@ -63,15 +63,4 @@ object HeaderProvider {
         }
         return headers
     }
-
-    fun getAASTokenHeaders(oauthToken: String): MutableMap<String, String> {
-        val headers: MutableMap<String, String> = HashMap()
-        headers["service"] = "ac2dm"
-        headers["add_account"] = "1"
-        headers["get_accountid"] = "1"
-        headers["ACCESS_TOKEN"] = "1"
-        headers["callerPkg"] = "com.google.android.gms"
-        headers["Token"] = oauthToken
-        return headers
-    }
 }

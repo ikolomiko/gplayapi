@@ -45,4 +45,15 @@ object ParamProvider {
         params["system_partition"] = "1"
         return params
     }
+
+    fun getAASTokenParams(oauthToken: String): MutableMap<String, String> {
+        val params: MutableMap<String, String> = HashMap()
+        params["service"] = "ac2dm"
+        params["add_account"] = "1"
+        params["get_accountid"] = "1"
+        params["ACCESS_TOKEN"] = "1"
+        params["callerPkg"] = "com.google.android.gms"
+        params["Token"] = oauthToken
+        return params
+    }
 }
