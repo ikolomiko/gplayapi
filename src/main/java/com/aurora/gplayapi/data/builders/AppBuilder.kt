@@ -44,8 +44,8 @@ object AppBuilder {
 
     fun build(item: Item): App {
         val appDetails = item.details.appDetails
-        val app = App(appDetails.packageName)
-        app.id = appDetails.packageName.hashCode()
+        val app = App(item.id)
+        app.id = item.id.hashCode()
         app.categoryId = item.categoryId
         app.displayName = item.title
         app.description = item.descriptionHtml
@@ -59,7 +59,6 @@ object AppBuilder {
             app.price = item.getOffer(0).formattedAmount
         }
 
-        app.packageName = appDetails.packageName
         app.versionName = appDetails.versionString
         app.versionCode = appDetails.versionCode
         app.categoryName = appDetails.categoryName
@@ -105,14 +104,14 @@ object AppBuilder {
             annotations.displayBadgeList?.let { badges ->
                 badges.forEach {
                     app.displayBadges.add(
-                            Badge().apply {
-                                textMajor = it.major
-                                textMinor = it.minor
-                                textMinorHtml = it.minorHtml
-                                textDescription = it.description
-                                artwork = ArtworkBuilder.build(it.image)
-                                link = it.link.toString()
-                            }
+                        Badge().apply {
+                            textMajor = it.major
+                            textMinor = it.minor
+                            textMinorHtml = it.minorHtml
+                            textDescription = it.description
+                            artwork = ArtworkBuilder.build(it.image)
+                            link = it.link.toString()
+                        }
                     )
                 }
             }
@@ -135,26 +134,26 @@ object AppBuilder {
 
     private fun parseFiles(app: App, appDetails: AppDetails) {
         app.fileList = appDetails.fileList
-                .map {
-                    var fileType = File.FileType.BASE
-                    var fileName = "${app.packageName}.${app.versionCode}.apk"
+            .map {
+                var fileType = File.FileType.BASE
+                var fileName = "${app.packageName}.${app.versionCode}.apk"
 
-                    if (it.hasSplitId()) {
-                        fileType = File.FileType.SPLIT
-                        fileName = "${it.splitId}.${app.versionCode}.apk"
-                    } else {
-                        if (it.fileType == 1) {
-                            fileName = "${app.packageName}.${app.versionCode}.obb"
-                            fileType = File.FileType.OBB
-                        }
-                    }
-                    File().apply {
-                        name = fileName
-                        type = fileType
-                        size = it.size
+                if (it.hasSplitId()) {
+                    fileType = File.FileType.SPLIT
+                    fileName = "${it.splitId}.${app.versionCode}.apk"
+                } else {
+                    if (it.fileType == 1) {
+                        fileName = "${app.packageName}.${app.versionCode}.obb"
+                        fileType = File.FileType.OBB
                     }
                 }
-                .toMutableList()
+                File().apply {
+                    name = fileName
+                    type = fileType
+                    size = it.size
+                }
+            }
+            .toMutableList()
     }
 
     private fun parseRating(app: App, item: Item) {
@@ -220,10 +219,10 @@ object AppBuilder {
     private fun parseChips(app: App, item: Item) {
         item.annotations.chipList?.forEach {
             app.chips.add(
-                    Chip().apply {
-                        title = it.title
-                        streamUrl = it.stream?.link?.streamUrl
-                    }
+                Chip().apply {
+                    title = it.title
+                    streamUrl = it.stream?.link?.streamUrl
+                }
             )
         }
     }

@@ -15,11 +15,9 @@
 
 package com.aurora.gplayapi.helpers
 
-import com.aurora.gplayapi.BuyResponse
+import com.aurora.gplayapi.*
 import com.aurora.gplayapi.Constants.PATCH_FORMAT
-import com.aurora.gplayapi.DeliveryResponse
-import com.aurora.gplayapi.GooglePlayApi
-import com.aurora.gplayapi.ResponseWrapper
+import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.File
 import com.aurora.gplayapi.data.providers.HeaderProvider
@@ -34,14 +32,43 @@ class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
         this.httpClient = httpClient
     }
 
+    fun getPurchaseHistory(offset: Int = 0): List<App> {
+        val headers: MutableMap<String, String> = HeaderProvider.getDefaultHeaders(authData)
+        val params: MutableMap<String, String> = mutableMapOf(
+            "o" to "$offset"
+        )
+        val playResponse = httpClient.get(
+            GooglePlayApi.PURCHASE_HISTORY_URL,
+            headers,
+            params
+        )
+
+        val purchaseAppList: MutableList<App> = mutableListOf()
+        val listResponse: ListResponse = getListResponseFromBytes(playResponse.responseBytes)
+        if (listResponse.itemCount > 0) {
+            for (item in listResponse.itemList) {
+                for (subItem in item.subItemList) {
+                    if (item.subItemCount > 0) {
+                        purchaseAppList.addAll(getAppsFromItem(subItem))
+                    }
+                }
+            }
+        }
+
+        return AppDetailsHelper(authData).getAppByPackageName(purchaseAppList.map { it.packageName })
+    }
+
     @Throws(IOException::class)
     fun getBuyResponse(packageName: String, versionCode: Int, offerType: Int): BuyResponse {
         val params: MutableMap<String, String> = HashMap()
         params["ot"] = offerType.toString()
         params["doc"] = packageName
         params["vc"] = versionCode.toString()
-        val playResponse =
-            httpClient.post(GooglePlayApi.PURCHASE_URL, HeaderProvider.getDefaultHeaders(authData), params)
+        val playResponse = httpClient.post(
+            GooglePlayApi.PURCHASE_URL,
+            HeaderProvider.getDefaultHeaders(authData),
+            params
+        )
         val payload = getPayLoadFromBytes(playResponse.responseBytes)
         return payload.buyResponse
     }

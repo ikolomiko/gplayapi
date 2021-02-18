@@ -190,6 +190,7 @@ class GooglePlayApi(private val authData: AuthData) {
         const val CATEGORIES_URL_2 = "$URL_FDFE/allCategoriesList"
         const val DELIVERY_URL = "$URL_FDFE/delivery"
         const val PURCHASE_URL = "$URL_FDFE/purchase"
+        const val PURCHASE_HISTORY_URL = "$URL_FDFE/purchaseHistory"
         const val TOP_CHART_URL = "$URL_FDFE/listTopChartItems"
         const val URL_AUTH = "$URL_BASE/auth"
         const val URL_BULK_DETAILS = "$URL_FDFE/bulkDetails"
