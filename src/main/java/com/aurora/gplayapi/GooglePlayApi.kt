@@ -205,6 +205,7 @@ class GooglePlayApi(private val authData: AuthData) {
         const val URL_REVIEWS = "$URL_FDFE/rev"
         const val URL_SEARCH = "$URL_FDFE/search"
         const val URL_SEARCH_SUGGEST = "$URL_FDFE/searchSuggest"
+        const val URL_TESTING_PROGRAM = "$URL_FDFE/apps/testingProgram"
         const val URL_TOC = "$URL_FDFE/toc"
         const val URL_TOS_ACCEPT = "$URL_FDFE/acceptTos"
         const val URL_UPLOAD_DEVICE_CONFIG = "$URL_FDFE/uploadDeviceConfig"

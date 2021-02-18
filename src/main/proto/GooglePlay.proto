@@ -1915,7 +1915,7 @@ message TestingProgramResult {
 }
 
 message TestingProgramDetails {
-  optional bool flag1 = 2;
+  optional bool subscribed = 2;
   optional int64 id = 3;
   optional bool unsubscribed = 4;
 }

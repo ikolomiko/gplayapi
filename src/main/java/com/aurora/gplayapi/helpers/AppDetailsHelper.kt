@@ -17,13 +17,17 @@ package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.ListResponse
+import com.aurora.gplayapi.TestingProgramRequest
 import com.aurora.gplayapi.data.builders.AppBuilder
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
+import com.aurora.gplayapi.data.models.details.TestingProgramStatus
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.exceptions.ApiException
 import com.aurora.gplayapi.network.IHttpClient
+import java.io.IOException
 import java.util.*
+
 
 class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
 
@@ -103,5 +107,38 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
 
     fun getDeveloperStream(devId: String): Map<String, List<App>> {
         return getDetailsStream("getDeveloperPageStream?docid=developer-$devId")
+    }
+
+    @Throws(IOException::class)
+    fun testingProgram(packageName: String?, subscribe: Boolean = true): TestingProgramStatus {
+        val request = TestingProgramRequest.newBuilder()
+            .setPackageName(packageName)
+            .setSubscribe(subscribe)
+            .build()
+
+        val playResponse = httpClient.post(
+            GooglePlayApi.URL_TESTING_PROGRAM,
+            getDefaultHeaders(authData),
+            request.toByteArray()
+        )
+
+        return if (playResponse.isSuccessful) {
+            val payload = getPayLoadFromBytes(playResponse.responseBytes)
+            payload.hasTestingProgramResponse()
+            TestingProgramStatus().apply {
+                if (payload.hasTestingProgramResponse()
+                    && payload.testingProgramResponse.hasResult()
+                    && payload.testingProgramResponse.result.hasDetails()
+                ) {
+                    val details = payload.testingProgramResponse.result.details
+                    if (details.hasSubscribed())
+                        subscribed = details.subscribed
+                    if (details.hasUnsubscribed())
+                        unsubscribed = details.unsubscribed
+                }
+            }
+        } else {
+            TestingProgramStatus()
+        }
     }
 }

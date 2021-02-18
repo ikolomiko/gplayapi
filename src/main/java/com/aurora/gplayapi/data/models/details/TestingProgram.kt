@@ -21,7 +21,12 @@ class TestingProgram {
     var artwork: Artwork = Artwork()
     var displayName: String = String()
     var email: String = String()
-    var isAvailable:Boolean = false
+    var isAvailable: Boolean = false
     var isSubscribed: Boolean = false
     var isSubscribedAndInstalled: Boolean = false
+}
+
+class TestingProgramStatus {
+    var subscribed: Boolean = false
+    var unsubscribed: Boolean = false
 }

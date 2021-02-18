@@ -26,7 +26,7 @@ class App(var packageName: String) {
     var categoryName: String = String()
     var categoryStreamUrl: String? = String()
     var changes: String = String()
-    var chips:MutableList<Chip> = mutableListOf()
+    var chips: MutableList<Chip> = mutableListOf()
     var containsAds = false
     var coverArtwork: Artwork = Artwork()
     var dependencies: Dependencies = Dependencies()
@@ -66,7 +66,7 @@ class App(var packageName: String) {
     var shortDescription: String = String()
     var size: Long = 0
     var targetSdk: Int = 21
-    var testingProgram = TestingProgram()
+    var testingProgram: TestingProgram? = null
     var userReview: Review = Review()
     var versionCode: Int = 0
     var versionName: String = String()
