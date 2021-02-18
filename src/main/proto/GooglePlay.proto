@@ -112,6 +112,7 @@ message BrowseResponse {
   optional int32 quickLinkTabIndex = 11;
   optional int32 quickLinkFallbackTabIndex = 12;
   optional bool isFamilySafe = 14;
+  optional string shareUrl = 18;
 }
 
 message DirectPurchase {

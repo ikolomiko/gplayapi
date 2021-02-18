@@ -198,6 +198,7 @@ class GooglePlayApi(private val authData: AuthData) {
         const val URL_BULK_PREFETCH = "$URL_FDFE/bulkPrefetch"
         const val URL_CHECK_IN = "$URL_BASE/checkin"
         const val URL_DETAILS = "$URL_FDFE/details"
+        const val URL_DETAILS_DEVELOPER = "$URL_FDFE/browseDeveloperPage"
         const val URL_MY_APPS = "$URL_FDFE/myApps"
         const val URL_REVIEW_ADD_EDIT = "$URL_FDFE/addReview"
         const val URL_REVIEW_USER = "$URL_FDFE/userReview"

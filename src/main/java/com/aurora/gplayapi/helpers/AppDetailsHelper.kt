@@ -91,11 +91,17 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
             val listResponse: ListResponse = payload.listResponse
             for (item in listResponse.itemList) {
                 for (subItem in item.subItemList) {
-                    appListMap[subItem.title] = getAppsFromItem(subItem)
+                    if (subItem.categoryId == 3) {
+                        appListMap[subItem.title] = getAppsFromItem(subItem)
+                    }
                 }
             }
         }
 
         return appListMap
+    }
+
+    fun getDeveloperStream(devId: String): Map<String, List<App>> {
+        return getDetailsStream("getDeveloperPageStream?docid=developer-$devId")
     }
 }
