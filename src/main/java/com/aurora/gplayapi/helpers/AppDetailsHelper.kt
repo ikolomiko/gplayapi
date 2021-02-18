@@ -15,7 +15,7 @@
 
 package com.aurora.gplayapi.helpers
 
-import com.aurora.gplayapi.GooglePlayApi
+import com.aurora.gplayapi.*
 import com.aurora.gplayapi.data.builders.AppBuilder
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
@@ -31,7 +31,7 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
     }
 
     @Throws(Exception::class)
-    fun getAppByPackageName(packageName: String): App? {
+    fun getAppByPackageName(packageName: String): App {
         val headers: Map<String, String> = getDefaultHeaders(authData)
         val params: MutableMap<String, String> = HashMap()
         params["doc"] = packageName

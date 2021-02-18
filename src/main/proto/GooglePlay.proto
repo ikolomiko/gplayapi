@@ -1012,6 +1012,12 @@ message AppDetails {
   optional string downloadLabel = 78;
 }
 
+message ModifyLibrary{
+  optional string id = 1;
+  optional string packageToAdd = 2;
+  optional string packageToRemove = 3;
+}
+
 message Publisher{
   optional PublisherStream publisherStream = 2;
 }
