@@ -18,7 +18,6 @@ package com.aurora.gplayapi.helpers
 import com.aurora.gplayapi.GetReviewsResponse
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.ReviewResponse
-import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.builders.ReviewBuilder.build
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.Review
@@ -26,9 +25,9 @@ import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
 
-class ReviewsHelper private constructor(authData: AuthData) : BaseHelper(authData) {
+class ReviewsHelper(authData: AuthData) : BaseHelper(authData) {
 
-    companion object : SingletonHolder<ReviewsHelper, AuthData>(::ReviewsHelper) {
+    companion object {
         const val DEFAULT_SIZE = 20
         var OFFSET = 0
     }
@@ -38,7 +37,11 @@ class ReviewsHelper private constructor(authData: AuthData) : BaseHelper(authDat
     }
 
     @Throws(Exception::class)
-    private fun getReviewResponse(url: String, params: Map<String, String>, headers: Map<String, String>): ReviewResponse? {
+    private fun getReviewResponse(
+        url: String,
+        params: Map<String, String>,
+        headers: Map<String, String>
+    ): ReviewResponse? {
         val responseBody = getResponse(url, params, headers)
         val payload = getPayLoadFromBytes(responseBody.responseBytes)
         return if (payload.hasReviewResponse()) payload.reviewResponse else null
@@ -56,7 +59,12 @@ class ReviewsHelper private constructor(authData: AuthData) : BaseHelper(authDat
     }
 
     @Throws(Exception::class)
-    fun getReviews(packageName: String, filter: Review.Filter, offset: Int = OFFSET, resultNum: Int = DEFAULT_SIZE): List<Review> {
+    fun getReviews(
+        packageName: String,
+        filter: Review.Filter,
+        offset: Int = OFFSET,
+        resultNum: Int = DEFAULT_SIZE
+    ): List<Review> {
         val params: MutableMap<String, String> = HashMap()
         params["doc"] = packageName
         params["o"] = offset.toString()

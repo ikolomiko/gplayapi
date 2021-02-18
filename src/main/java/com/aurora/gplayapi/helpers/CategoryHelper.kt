@@ -17,7 +17,6 @@ package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.Item
-import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.Category
 import com.aurora.gplayapi.data.models.StreamBundle
@@ -25,9 +24,7 @@ import com.aurora.gplayapi.data.providers.HeaderProvider
 import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
 
-class CategoryHelper private constructor(authData: AuthData) : BaseHelper(authData) {
-
-    companion object : SingletonHolder<CategoryHelper, AuthData>(::CategoryHelper)
+class CategoryHelper(authData: AuthData) : BaseHelper(authData) {
 
     override fun using(httpClient: IHttpClient) = apply {
         this.httpClient = httpClient

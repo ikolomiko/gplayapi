@@ -16,7 +16,6 @@
 package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.GooglePlayApi
-import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.sale.SaleBundle
@@ -25,9 +24,7 @@ import com.google.gson.Gson
 import java.io.IOException
 import java.util.*
 
-class AppSalesHelper private constructor(authData: AuthData) : BaseHelper(authData) {
-
-    companion object : SingletonHolder<AppSalesHelper, AuthData>(::AppSalesHelper)
+class AppSalesHelper(authData: AuthData) : BaseHelper(authData) {
 
     override fun using(httpClient: IHttpClient) = apply {
         this.httpClient = httpClient
@@ -49,7 +46,7 @@ class AppSalesHelper private constructor(authData: AuthData) : BaseHelper(authDa
         return if (saleBundle.sales.isEmpty())
             listOf()
         else {
-            val appDetailsHelper = AppDetailsHelper.with(authData)
+            val appDetailsHelper = AppDetailsHelper(authData)
             return appDetailsHelper.getAppByPackageName(packageList = saleBundle.sales.map { it.idandroid }.toList())
         }
     }

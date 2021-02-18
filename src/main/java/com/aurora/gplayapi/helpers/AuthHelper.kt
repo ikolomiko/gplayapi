@@ -23,7 +23,7 @@ import com.aurora.gplayapi.network.DefaultHttpClient
 import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
 
-class AuthHelper {
+class AuthHelper private constructor() {
 
     companion object {
 
@@ -80,6 +80,4 @@ class AuthHelper {
             return authData
         }
     }
-
-    private constructor()
 }

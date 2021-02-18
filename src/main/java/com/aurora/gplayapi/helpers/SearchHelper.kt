@@ -15,7 +15,10 @@
 
 package com.aurora.gplayapi.helpers
 
-import com.aurora.gplayapi.*
+import com.aurora.gplayapi.GooglePlayApi
+import com.aurora.gplayapi.Item
+import com.aurora.gplayapi.ListResponse
+import com.aurora.gplayapi.SearchSuggestEntry
 import com.aurora.gplayapi.data.builders.AppBuilder
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
@@ -26,28 +29,26 @@ import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
 
-class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData) {
+class SearchHelper(authData: AuthData) : BaseHelper(authData) {
 
-    companion object : SingletonHolder<SearchHelper, AuthData>(::SearchHelper) {
-        private const val SEARCH_TYPE_EXTRA = "_-"
+    private val searchTypeExtra = "_-"
 
-        private fun getSubBundle(item: Item): SubBundle {
-            try {
-                val nextPageUrl = item.containerMetadata.nextPageUrl
-                if (nextPageUrl.isNotBlank()) {
-                    if (nextPageUrl.contains(SEARCH_TYPE_EXTRA)) {
-                        if (nextPageUrl.startsWith("getCluster?enpt=CkC"))
-                            return SubBundle(nextPageUrl, SearchBundle.Type.SIMILAR)
-                        if (nextPageUrl.startsWith("getCluster?enpt=CkG"))
-                            return SubBundle(nextPageUrl, SearchBundle.Type.RELATED_TO_YOUR_SEARCH)
-                    } else {
-                        return SubBundle(nextPageUrl, SearchBundle.Type.GENERIC)
-                    }
+    private fun getSubBundle(item: Item): SubBundle {
+        try {
+            val nextPageUrl = item.containerMetadata.nextPageUrl
+            if (nextPageUrl.isNotBlank()) {
+                if (nextPageUrl.contains(searchTypeExtra)) {
+                    if (nextPageUrl.startsWith("getCluster?enpt=CkC"))
+                        return SubBundle(nextPageUrl, SearchBundle.Type.SIMILAR)
+                    if (nextPageUrl.startsWith("getCluster?enpt=CkG"))
+                        return SubBundle(nextPageUrl, SearchBundle.Type.RELATED_TO_YOUR_SEARCH)
+                } else {
+                    return SubBundle(nextPageUrl, SearchBundle.Type.GENERIC)
                 }
-            } catch (ignored: Exception) {
             }
-            return SubBundle("", SearchBundle.Type.BOGUS)
+        } catch (ignored: Exception) {
         }
+        return SubBundle("", SearchBundle.Type.BOGUS)
     }
 
     override fun using(httpClient: IHttpClient) = apply {
@@ -59,11 +60,13 @@ class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData
     @Throws(Exception::class)
     fun searchSuggestions(query: String): List<SearchSuggestEntry> {
         val header: MutableMap<String, String> = getDefaultHeaders(authData)
-        val paramString = String.format("?q=%s&sb=%d&sst=%d&sst=%d",
-                query,
-                5,
-                2 /*Text Entry*/,
-                3 /*Item Doc Id : 3 -> Apps*/)
+        val paramString = String.format(
+            "?q=%s&sb=%d&sst=%d&sst=%d",
+            query,
+            5,
+            2 /*Text Entry*/,
+            3 /*Item Doc Id : 3 -> Apps*/
+        )
         val responseBody = httpClient.get(GooglePlayApi.URL_SEARCH_SUGGEST, header, paramString)
         val searchSuggestResponse = getSearchSuggestResponseFromBytes(responseBody.responseBytes)
         return if (searchSuggestResponse != null && searchSuggestResponse.entryCount > 0) {
@@ -80,8 +83,7 @@ class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData
         param["c"] = "3"
         param["ksm"] = "1"
 
-        val responseBody: PlayResponse
-        responseBody = if (nextPageUrl.isNotEmpty()) {
+        val responseBody: PlayResponse = if (nextPageUrl.isNotEmpty()) {
             httpClient.get(GooglePlayApi.URL_SEARCH + "/" + nextPageUrl, header)
         } else {
             httpClient.get(GooglePlayApi.URL_SEARCH, header, param)
@@ -94,8 +96,8 @@ class SearchHelper private constructor(authData: AuthData) : BaseHelper(authData
             if (payload.hasListResponse()) {
                 searchBundle = getSearchBundle(payload.listResponse)
                 searchBundle.subBundles = searchBundle.subBundles
-                        .filter { it.type == SearchBundle.Type.GENERIC }
-                        .toMutableSet()
+                    .filter { it.type == SearchBundle.Type.GENERIC }
+                    .toMutableSet()
                 return searchBundle
             }
         }

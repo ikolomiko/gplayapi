@@ -44,7 +44,7 @@ class UserProfileHelper(authData: AuthData) : BaseHelper(authData) {
     fun getUserProfile(): UserProfile? {
         return try {
             UserProfileBuilder.build(
-                    getUserProfileResponse().userProfile
+                getUserProfileResponse().userProfile
             )
         } catch (e: Exception) {
             null

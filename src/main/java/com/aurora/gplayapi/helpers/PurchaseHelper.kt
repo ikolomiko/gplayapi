@@ -15,8 +15,11 @@
 
 package com.aurora.gplayapi.helpers
 
-import com.aurora.gplayapi.*
+import com.aurora.gplayapi.BuyResponse
 import com.aurora.gplayapi.Constants.PATCH_FORMAT
+import com.aurora.gplayapi.DeliveryResponse
+import com.aurora.gplayapi.GooglePlayApi
+import com.aurora.gplayapi.ResponseWrapper
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.File
 import com.aurora.gplayapi.data.providers.HeaderProvider
@@ -25,9 +28,7 @@ import com.aurora.gplayapi.network.IHttpClient
 import java.io.IOException
 import java.util.*
 
-class PurchaseHelper private constructor(authData: AuthData) : BaseHelper(authData) {
-
-    companion object : SingletonHolder<PurchaseHelper, AuthData>(::PurchaseHelper)
+class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
 
     override fun using(httpClient: IHttpClient) = apply {
         this.httpClient = httpClient
@@ -39,18 +40,25 @@ class PurchaseHelper private constructor(authData: AuthData) : BaseHelper(authDa
         params["ot"] = offerType.toString()
         params["doc"] = packageName
         params["vc"] = versionCode.toString()
-        val playResponse = httpClient.post(GooglePlayApi.PURCHASE_URL, HeaderProvider.getDefaultHeaders(authData), params)
+        val playResponse =
+            httpClient.post(GooglePlayApi.PURCHASE_URL, HeaderProvider.getDefaultHeaders(authData), params)
         val payload = getPayLoadFromBytes(playResponse.responseBytes)
         return payload.buyResponse
     }
 
     @Throws(IOException::class)
-    fun getDeliveryResponse(packageName: String,
-                            installedVersionCode: Int = 0,
-                            updateVersionCode: Int,
-                            offerType: Int,
-                            patchFormats: Array<PATCH_FORMAT> = arrayOf(PATCH_FORMAT.GDIFF, PATCH_FORMAT.GZIPPED_GDIFF, PATCH_FORMAT.GZIPPED_BSDIFF),
-                            downloadToken: String): DeliveryResponse {
+    fun getDeliveryResponse(
+        packageName: String,
+        installedVersionCode: Int = 0,
+        updateVersionCode: Int,
+        offerType: Int,
+        patchFormats: Array<PATCH_FORMAT> = arrayOf(
+            PATCH_FORMAT.GDIFF,
+            PATCH_FORMAT.GZIPPED_GDIFF,
+            PATCH_FORMAT.GZIPPED_BSDIFF
+        ),
+        downloadToken: String
+    ): DeliveryResponse {
 
         val params: MutableMap<String, String> = HashMap()
         params["ot"] = offerType.toString()
@@ -66,7 +74,8 @@ class PurchaseHelper private constructor(authData: AuthData) : BaseHelper(authDa
             params["dtok"] = downloadToken
         }
 
-        val playResponse = httpClient.get(GooglePlayApi.DELIVERY_URL, HeaderProvider.getDefaultHeaders(authData), params)
+        val playResponse =
+            httpClient.get(GooglePlayApi.DELIVERY_URL, HeaderProvider.getDefaultHeaders(authData), params)
         val payload = ResponseWrapper.parseFrom(playResponse.responseBytes).payload
         return payload.deliveryResponse
     }
@@ -74,10 +83,12 @@ class PurchaseHelper private constructor(authData: AuthData) : BaseHelper(authDa
     @Throws(Exception::class)
     fun purchase(packageName: String, versionCode: Int, offerType: Int): List<File> {
         val buyResponse = getBuyResponse(packageName, versionCode, offerType)
-        val deliveryResponse = getDeliveryResponse(packageName = packageName,
-                updateVersionCode = versionCode,
-                offerType = offerType,
-                downloadToken = buyResponse.encodedDeliveryToken)
+        val deliveryResponse = getDeliveryResponse(
+            packageName = packageName,
+            updateVersionCode = versionCode,
+            offerType = offerType,
+            downloadToken = buyResponse.encodedDeliveryToken
+        )
 
         when (deliveryResponse.status) {
             1 ->
@@ -92,7 +103,11 @@ class PurchaseHelper private constructor(authData: AuthData) : BaseHelper(authDa
         }
     }
 
-    private fun getDownloadsFromDeliveryResponse(packageName: String?, versionCode: Int, deliveryResponse: DeliveryResponse?): List<File> {
+    private fun getDownloadsFromDeliveryResponse(
+        packageName: String?,
+        versionCode: Int,
+        deliveryResponse: DeliveryResponse?
+    ): List<File> {
         val fileList: MutableList<File> = ArrayList()
         if (deliveryResponse != null) {
             //Add base apk

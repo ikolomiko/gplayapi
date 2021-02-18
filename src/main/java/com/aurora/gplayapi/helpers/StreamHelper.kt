@@ -17,7 +17,6 @@ package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.ListResponse
-import com.aurora.gplayapi.SingletonHolder
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.StreamBundle
 import com.aurora.gplayapi.data.models.editor.EditorChoiceBundle
@@ -25,9 +24,7 @@ import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
 
-class StreamHelper private constructor(authData: AuthData) : BaseHelper(authData) {
-
-    companion object : SingletonHolder<StreamHelper, AuthData>(::StreamHelper)
+class StreamHelper(authData: AuthData) : BaseHelper(authData) {
 
     override fun using(httpClient: IHttpClient) = apply {
         this.httpClient = httpClient
