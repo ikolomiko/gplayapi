@@ -15,7 +15,8 @@
 
 package com.aurora.gplayapi.helpers
 
-import com.aurora.gplayapi.*
+import com.aurora.gplayapi.GooglePlayApi
+import com.aurora.gplayapi.ListResponse
 import com.aurora.gplayapi.data.builders.AppBuilder
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
@@ -40,7 +41,7 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
 
         if (playResponse.isSuccessful) {
             val detailsResponse = getDetailsResponseFromBytes(playResponse.responseBytes)
-            return AppBuilder.build(detailsResponse.item)
+            return AppBuilder.build(detailsResponse)
         } else {
             throw ApiException.AppNotFound(playResponse.errorString)
         }
@@ -71,5 +72,30 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
             return appList
         } else
             throw ApiException.Server(playResponse.code, playResponse.errorString)
+    }
+
+    fun getDetailsStream(streamUrl: String): Map<String, List<App>> {
+        val headers: Map<String, String> = getDefaultHeaders(authData)
+        val params: MutableMap<String, String> = HashMap()
+
+        val playResponse = httpClient.get(
+            "${GooglePlayApi.URL_FDFE}/${streamUrl}",
+            headers,
+            params
+        )
+
+        val appListMap: MutableMap<String, List<App>> = mutableMapOf()
+
+        if (playResponse.isSuccessful) {
+            val payload = getPayLoadFromBytes(playResponse.responseBytes)
+            val listResponse: ListResponse = payload.listResponse
+            for (item in listResponse.itemList) {
+                for (subItem in item.subItemList) {
+                    appListMap[subItem.title] = getAppsFromItem(subItem)
+                }
+            }
+        }
+
+        return appListMap
     }
 }

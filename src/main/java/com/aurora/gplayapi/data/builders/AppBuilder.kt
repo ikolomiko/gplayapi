@@ -30,14 +30,13 @@ object AppBuilder {
         val item = detailsResponse.item
         val app = build(item)
 
-        app.footerHtml = if (detailsResponse.footerHtml.isNotBlank())
-            detailsResponse.footerHtml
-        else
-            String()
-
         if (detailsResponse.hasUserReview()) {
             app.userReview = ReviewBuilder.build(detailsResponse.userReview)
         }
+
+        app.detailsStreamUrl = detailsResponse.detailsStreamUrl
+        app.detailsPostAcquireStreamUrl = detailsResponse.postAcquireDetailsStreamUrl
+        app.footerHtml = detailsResponse.footerHtml
 
         return app
     }

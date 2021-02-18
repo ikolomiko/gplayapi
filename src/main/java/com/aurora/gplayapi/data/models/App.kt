@@ -31,6 +31,8 @@ class App(var packageName: String) {
     var coverArtwork: Artwork = Artwork()
     var dependencies: Dependencies = Dependencies()
     var description: String = String()
+    var detailsStreamUrl: String? = String()
+    var detailsPostAcquireStreamUrl: String? = String()
     var developerAddress: String = String()
     var developerEmail: String = String()
     var developerName: String = String()
