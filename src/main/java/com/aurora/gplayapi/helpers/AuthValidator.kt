@@ -26,9 +26,18 @@ class AuthValidator(authData: AuthData) : BaseHelper(authData) {
         this.httpClient = httpClient
     }
 
-    fun isValid(): Boolean {
+    fun isValid(endpoint: String = GooglePlayApi.URL_SYNC, method: METHOD = METHOD.POST): Boolean {
         val headers = HeaderProvider.getDefaultHeaders(authData)
-        val playResponse = httpClient.post(GooglePlayApi.URL_SYNC, headers, hashMapOf()) // OR use contentSync
+        val playResponse = when (method) {
+            METHOD.POST -> httpClient.post(endpoint, headers, hashMapOf())
+            METHOD.GET -> httpClient.get(endpoint, headers, hashMapOf())
+        }
+
         return playResponse.isSuccessful
+    }
+
+    enum class METHOD {
+        GET,
+        POST
     }
 }
