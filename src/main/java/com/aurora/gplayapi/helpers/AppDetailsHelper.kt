@@ -70,6 +70,6 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
             }
             return appList
         } else
-            throw ApiException.Server(playResponse.errorString)
+            throw ApiException.Server(playResponse.code, playResponse.errorString)
     }
 }

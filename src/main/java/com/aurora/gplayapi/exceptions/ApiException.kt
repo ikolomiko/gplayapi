@@ -15,39 +15,19 @@
 
 package com.aurora.gplayapi.exceptions
 
-import java.io.IOException
+import java.lang.Exception
 
-class ApiException {
+sealed class ApiException {
 
-    internal class AppNotPurchased : BaseException {
-        constructor() : super("App Not Purchased")
-        constructor(message: String?) : super(message)
-        constructor(message: String?, cause: Throwable?) : super(message, cause)
-    }
+    data class AppNotPurchased(val reason: String = "App not purchased") : Exception()
 
-    internal class AppNotFound : BaseException {
-        constructor() : super("App Not Found")
-        constructor(message: String?) : super(message)
-        constructor(message: String?, cause: Throwable?) : super(message, cause)
-    }
+    data class AppNotFound(val reason: String = "App not found, maybe restricted (OEM or Geo)") : Exception()
 
-    internal class AppNotSupported : BaseException {
-        constructor() : super("App Not Supported")
-        constructor(message: String?) : super(message)
-        constructor(message: String?, cause: Throwable?) : super(message, cause)
-    }
+    data class AppNotSupported(val reason: String = "App not supported") : Exception()
 
-    internal class Unknown() : BaseException("¯\\_(ツ)_/¯")
+    data class EmptyDownloads(val reason: String = "File list empty") : Exception() //Not sure about the root cause.
 
-    internal class Server : BaseException {
-        constructor() : super()
-        constructor(message: String?) : super(message)
-        constructor(message: String?, cause: Throwable?) : super(message, cause)
-    }
+    data class Unknown(val reason: String = "¯\\_(ツ)_/¯") : Exception()
 
-    internal open class BaseException : IOException {
-        constructor() : super()
-        constructor(message: String?) : super(message)
-        constructor(message: String?, cause: Throwable?) : super(message, cause)
-    }
+    data class Server(val code: Int = 500, val reason: String = "Server error") : Exception()
 }

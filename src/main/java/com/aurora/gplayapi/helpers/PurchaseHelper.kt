@@ -64,13 +64,19 @@ class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
         params["ot"] = offerType.toString()
         params["doc"] = packageName
         params["vc"] = versionCode.toString()
+
         val playResponse = httpClient.post(
             GooglePlayApi.PURCHASE_URL,
             HeaderProvider.getDefaultHeaders(authData),
             params
         )
-        val payload = getPayLoadFromBytes(playResponse.responseBytes)
-        return payload.buyResponse
+
+        return if (playResponse.isSuccessful) {
+            val payload = getPayLoadFromBytes(playResponse.responseBytes)
+            payload.buyResponse
+        } else {
+            BuyResponse.getDefaultInstance()
+        }
     }
 
     @Throws(IOException::class)
@@ -126,7 +132,6 @@ class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
                 throw ApiException.AppNotPurchased()
             else ->
                 throw ApiException.Unknown()
-
         }
     }
 
@@ -135,7 +140,7 @@ class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
         versionCode: Int,
         deliveryResponse: DeliveryResponse?
     ): List<File> {
-        val fileList: MutableList<File> = ArrayList()
+        val fileList: MutableList<File> = mutableListOf()
         if (deliveryResponse != null) {
             //Add base apk
             val androidAppDeliveryData = deliveryResponse.appDeliveryData
@@ -176,6 +181,10 @@ class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
                 }
             }
         }
+
+        if (fileList.isEmpty())
+            throw ApiException.Unknown()
+
         return fileList
     }
 }
