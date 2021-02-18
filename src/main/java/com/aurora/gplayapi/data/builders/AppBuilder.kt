@@ -75,6 +75,7 @@ object AppBuilder {
         app.developerAddress = appDetails.developerAddress
         app.developerWebsite = appDetails.developerWebsite
         app.targetSdk = appDetails.targetSdkVersion
+        app.updatedOn = appDetails.infoUpdatedOn
 
         if (app.developerName.isEmpty())
             app.developerName = item.creator

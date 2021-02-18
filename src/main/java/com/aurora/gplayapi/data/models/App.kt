@@ -68,6 +68,7 @@ class App(var packageName: String) {
     var targetSdk: Int = 21
     var testingProgram: TestingProgram? = null
     var userReview: Review = Review()
+    var updatedOn: String = String()
     var versionCode: Int = 0
     var versionName: String = String()
     var videoArtwork: Artwork = Artwork()
