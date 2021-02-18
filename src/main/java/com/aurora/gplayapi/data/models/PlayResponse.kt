@@ -18,7 +18,7 @@ package com.aurora.gplayapi.data.models
 class PlayResponse {
     var responseBytes: ByteArray = byteArrayOf()
     var errorBytes: ByteArray = byteArrayOf()
-    var errorString: String = ("Unknown Error")
+    var errorString: String = ("No Error")
     var isSuccessful: Boolean = false
     var code: Int = 0
 }
