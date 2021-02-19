@@ -22,6 +22,7 @@ import com.aurora.gplayapi.TestingProgramRequest
 import com.aurora.gplayapi.data.builders.AppBuilder
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
+import com.aurora.gplayapi.data.models.StreamBundle
 import com.aurora.gplayapi.data.models.details.DevStream
 import com.aurora.gplayapi.data.models.details.TestingProgramStatus
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
@@ -114,7 +115,7 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
             throw ApiException.Server(playResponse.code, playResponse.errorString)
     }
 
-    fun getDetailsStream(streamUrl: String): Map<String, List<App>> {
+    fun getDetailsStream(streamUrl: String): StreamBundle {
         val headers: Map<String, String> = getDefaultHeaders(authData)
         val params: MutableMap<String, String> = HashMap()
 
@@ -124,14 +125,12 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
             params
         )
 
-        val appListMap: MutableMap<String, List<App>> = mutableMapOf()
-
         if (playResponse.isSuccessful) {
             val payload = getPayLoadFromBytes(playResponse.responseBytes)
-            appListMap.putAll(getAppListMapFromPayload(payload))
+            return getStreamBundle(payload.listResponse)
         }
 
-        return appListMap
+        return StreamBundle()
     }
 
     fun getDeveloperStream(devId: String): DevStream {
