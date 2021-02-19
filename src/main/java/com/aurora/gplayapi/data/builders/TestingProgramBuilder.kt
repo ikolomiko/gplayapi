@@ -26,7 +26,7 @@ object TestingProgramBuilder {
                 artwork = ArtworkBuilder.build(it.image)
                 displayName = it.displayName
                 email = it.email
-                isAvailable = true
+                isAvailable = false
                 isSubscribed = it.subscribed
                 isSubscribedAndInstalled = it.subscribedAndInstalled
             }
