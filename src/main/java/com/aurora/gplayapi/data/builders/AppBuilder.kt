@@ -204,6 +204,14 @@ object AppBuilder {
                 Constants.IMAGE_TYPE_APP_SCREENSHOT -> app.screenshots.add(artwork)
             }
         }
+
+        if (app.screenshots.isEmpty()) {
+            if (item.hasAnnotations() && item.annotations.hasSectionImage()) {
+                for (imageContainer in item.annotations.sectionImage.imageContainerList) {
+                    app.screenshots.add(ArtworkBuilder.build(imageContainer.image))
+                }
+            }
+        }
     }
 
     private fun parseStreamUrls(app: App, item: Item) {
