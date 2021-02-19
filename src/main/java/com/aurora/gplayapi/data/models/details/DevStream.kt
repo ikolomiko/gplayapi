@@ -15,11 +15,11 @@
 
 package com.aurora.gplayapi.data.models.details
 
-import com.aurora.gplayapi.data.models.App
+import com.aurora.gplayapi.data.models.StreamBundle
 
 class DevStream {
     var title: String = String()
     var description: String = String()
     var imgUrl: String = String()
-    var appListMap: MutableMap<String, List<App>> = mutableMapOf()
+    var streamBundle: StreamBundle = StreamBundle()
 }

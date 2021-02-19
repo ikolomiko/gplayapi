@@ -148,7 +148,7 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
         if (playResponse.isSuccessful) {
             val payload = getPayLoadFromBytes(playResponse.responseBytes)
             devStream = getDevStream(payload)
-            devStream.appListMap.putAll(getAppListMapFromPayload(payload))
+            devStream.streamBundle = getStreamBundle(payload.listResponse)
         }
 
         return devStream
