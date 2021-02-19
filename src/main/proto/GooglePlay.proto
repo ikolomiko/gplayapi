@@ -906,6 +906,14 @@ message DocumentVariant {
   optional string subtitle = 14;
 }
 
+message SectionImage {
+  repeated ImageContainer imageContainer = 1;
+}
+
+message ImageContainer {
+  optional Image image = 4;
+}
+
 message Image {
   optional int32 imageType = 1;
   optional group Dimension = 2 {
@@ -1167,6 +1175,7 @@ message Annotations {
   repeated Warning warning = 4;
   optional SectionMetaData sectionBodyOfWork = 5;
   optional SectionMetaData sectionCoreContent = 6;
+  optional OverlayMetaData overlayMetaData = 7;
   repeated Badge badgeForCreator = 8;
   repeated Badge infoBadge = 9;
   optional AnnotationLink annotationLink = 10;
@@ -1203,8 +1212,45 @@ message Annotations {
   repeated Badge displayBadge = 72;
   optional string liveStreamUrl = 80;
   optional string promotionStreamUrl = 85;
+  optional OverlayMetaData overlayMetaDataExtra = 91;
+  optional SectionImage sectionImage = 94;
   optional SubStream categoryStream = 97;
 }
+
+message SectionMetaData {
+  optional string header = 1;
+  optional string listUrl = 2;
+  optional string browseUrl = 3;
+  optional string description = 4;
+}
+
+message OverlayMetaData{
+  optional OverlayHeader overlayHeader = 1;
+  optional OverlayTitle overlayTitle = 181;
+  optional OverlayDescription overlayDescription = 182;
+}
+
+message OverlayHeader{
+
+}
+
+message OverlayTitle{
+  optional string title = 1;
+  optional CompositeImage compositeImage = 3;
+}
+
+message CompositeImage{
+  optional int32 type = 1;
+  optional string url = 5;
+  optional int32 typeAlt = 9;
+  optional string title = 24;
+  optional string urlAlt = 28;
+}
+
+message OverlayDescription{
+  optional string description = 2;
+}
+
 message SuggestionReasons {
   repeated Reason reason = 2;
   optional Dismissal neutralDismissal = 4;
@@ -1307,13 +1353,6 @@ message Rated {
   optional string label = 1;
   optional Image image = 2;
   optional string learnMoreHtmlLink = 4;
-}
-
-message SectionMetaData {
-  optional string header = 1;
-  optional string listUrl = 2;
-  optional string browseUrl = 3;
-  optional string description = 4;
 }
 
 message Badge {

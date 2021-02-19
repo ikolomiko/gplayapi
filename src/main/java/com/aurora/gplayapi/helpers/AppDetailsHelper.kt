@@ -17,10 +17,12 @@ package com.aurora.gplayapi.helpers
 
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.ListResponse
+import com.aurora.gplayapi.Payload
 import com.aurora.gplayapi.TestingProgramRequest
 import com.aurora.gplayapi.data.builders.AppBuilder
 import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.AuthData
+import com.aurora.gplayapi.data.models.details.DevStream
 import com.aurora.gplayapi.data.models.details.TestingProgramStatus
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.exceptions.ApiException
@@ -33,6 +35,40 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
 
     override fun using(httpClient: IHttpClient) = apply {
         this.httpClient = httpClient
+    }
+
+    private fun getAppListMapFromPayload(payload: Payload): Map<String, List<App>> {
+        val appListMap: MutableMap<String, List<App>> = mutableMapOf()
+        val listResponse: ListResponse = payload.listResponse
+        for (item in listResponse.itemList) {
+            for (subItem in item.subItemList) {
+                if (subItem.categoryId == 3) {
+                    appListMap[subItem.title] = getAppsFromItem(subItem)
+                }
+            }
+        }
+        return appListMap
+    }
+
+    private fun getDevStream(payload: Payload): DevStream {
+        val devStream = DevStream()
+        val listResponse: ListResponse = payload.listResponse
+        for (item in listResponse.itemList) {
+            for (subItem in item.subItemList) {
+                if (subItem.categoryId != 3) {
+                    if (subItem.hasAnnotations() && subItem.annotations.hasOverlayMetaData()) {
+                        if (subItem.annotations.overlayMetaData.hasOverlayTitle()) {
+                            devStream.title = subItem.annotations.overlayMetaData.overlayTitle.title
+                            devStream.imgUrl = subItem.annotations.overlayMetaData.overlayTitle.compositeImage.url
+                        }
+                        if (subItem.annotations.overlayMetaData.hasOverlayDescription()) {
+                            devStream.description = subItem.annotations.overlayMetaData.overlayDescription.description
+                        }
+                    }
+                }
+            }
+        }
+        return devStream
     }
 
     @Throws(Exception::class)
@@ -92,21 +128,31 @@ class AppDetailsHelper(authData: AuthData) : BaseHelper(authData) {
 
         if (playResponse.isSuccessful) {
             val payload = getPayLoadFromBytes(playResponse.responseBytes)
-            val listResponse: ListResponse = payload.listResponse
-            for (item in listResponse.itemList) {
-                for (subItem in item.subItemList) {
-                    if (subItem.categoryId == 3) {
-                        appListMap[subItem.title] = getAppsFromItem(subItem)
-                    }
-                }
-            }
+            appListMap.putAll(getAppListMapFromPayload(payload))
         }
 
         return appListMap
     }
 
-    fun getDeveloperStream(devId: String): Map<String, List<App>> {
-        return getDetailsStream("getDeveloperPageStream?docid=developer-$devId")
+    fun getDeveloperStream(devId: String): DevStream {
+        val headers: Map<String, String> = getDefaultHeaders(authData)
+        val params: MutableMap<String, String> = HashMap()
+
+        val playResponse = httpClient.get(
+            "${GooglePlayApi.URL_FDFE}/getDeveloperPageStream?docid=developer-$devId",
+            headers,
+            params
+        )
+
+        var devStream = DevStream()
+
+        if (playResponse.isSuccessful) {
+            val payload = getPayLoadFromBytes(playResponse.responseBytes)
+            devStream = getDevStream(payload)
+            devStream.appListMap.putAll(getAppListMapFromPayload(payload))
+        }
+
+        return devStream
     }
 
     @Throws(IOException::class)
