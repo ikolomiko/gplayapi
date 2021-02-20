@@ -38,11 +38,11 @@ abstract class BaseHelper(protected var authData: AuthData) {
     }
 
     /*-------------------------------------------- COMMONS -------------------------------------------------*/
-    private fun getNextPageUrl(item: Item): String {
+    fun getNextPageUrl(item: Item): String {
         return if (item.hasContainerMetadata() && item.containerMetadata.hasNextPageUrl()) item.containerMetadata.nextPageUrl else String()
     }
 
-    private fun getBrowseUrl(item: Item): String {
+    fun getBrowseUrl(item: Item): String {
         return if (item.hasContainerMetadata() && item.containerMetadata.hasBrowseUrl()) item.containerMetadata.browseUrl else String()
     }
 
@@ -88,7 +88,7 @@ abstract class BaseHelper(protected var authData: AuthData) {
         } else payload
     }
 
-    fun getAppsFromItem(item: Item): MutableList<App> {
+    open fun getAppsFromItem(item: Item): MutableList<App> {
         val appList: MutableList<App> = mutableListOf()
         if (item.subItemCount > 0) {
             for (subItem in item.subItemList) {
@@ -152,7 +152,7 @@ abstract class BaseHelper(protected var authData: AuthData) {
         return getStreamCluster(listResponse)
     }
 
-    fun getStreamCluster(item: Item): StreamCluster {
+    open fun getStreamCluster(item: Item): StreamCluster {
         val title = if (item.hasTitle()) item.title else String()
         val subtitle = if (item.hasSubtitle()) item.subtitle else String()
         val browseUrl = getBrowseUrl(item)
