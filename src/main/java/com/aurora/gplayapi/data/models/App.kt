@@ -39,6 +39,7 @@ class App(var packageName: String) {
     var developerWebsite: String = String()
     var displayBadges: MutableList<Badge> = mutableListOf()
     var displayName: String = String()
+    var editorReason: String = String()
     var downloadString: String = String()
     var earlyAccess = false
     var fileList: MutableList<File> = mutableListOf()

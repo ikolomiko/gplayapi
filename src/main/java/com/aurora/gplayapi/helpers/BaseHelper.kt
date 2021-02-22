@@ -81,9 +81,10 @@ abstract class BaseHelper(protected var authData: AuthData) {
         val responseWrapper = ResponseWrapper.parseFrom(bytes)
         val payload = responseWrapper.payload
         return if (responseWrapper.preFetchCount > 0 && ((payload.hasSearchResponse()
-                        && payload.searchResponse.itemCount == 0)
-                        || payload.hasListResponse() && payload.listResponse.itemCount == 0
-                        || payload.hasBrowseResponse())) {
+                    && payload.searchResponse.itemCount == 0)
+                    || payload.hasListResponse() && payload.listResponse.itemCount == 0
+                    || payload.hasBrowseResponse())
+        ) {
             responseWrapper.getPreFetch(0).response.payload
         } else payload
     }
@@ -253,34 +254,8 @@ abstract class BaseHelper(protected var authData: AuthData) {
 
     /*------------------------------------- EDITOR'S CHOICE CLUSTER & BUNDLES ------------------------------------*/
     @Throws(Exception::class)
-    fun getEditorChoiceBrowseResponse(nextPageUrl: String): ListResponse {
-        val headers: Map<String, String> = getDefaultHeaders(authData)
-        val responseBody = httpClient.get(GooglePlayApi.URL_FDFE + "/" + nextPageUrl, headers)
-        val payload = getPrefetchPayLoad(responseBody.responseBytes)
-        return payload.listResponse
-    }
 
-    fun getEditorChoiceApps(browseUrl: String): List<App> {
-        val listResponse = getEditorChoiceBrowseResponse(browseUrl)
-        return getEditorChoiceApps(listResponse)
-    }
-
-    private fun getEditorChoiceApps(listResponse: ListResponse?): List<App> {
-        val appList: MutableList<App> = ArrayList()
-        if (listResponse != null && listResponse.itemCount > 0) {
-            val item = listResponse.getItem(0)
-            if (item != null && item.subItemCount > 0) {
-                for (subItem in item.subItemList) {
-                    if (subItem.subItemCount > 0) {
-                        appList.add(build(subItem.getSubItem(0)))
-                    }
-                }
-            }
-        }
-        return appList
-    }
-
-    fun getEditorChoiceCluster(item: Item): EditorChoiceCluster {
+    private fun getEditorChoiceCluster(item: Item): EditorChoiceCluster {
         val title = if (item.hasTitle()) item.title else String()
         val artworkList: MutableList<Artwork> = ArrayList()
         val browseUrl = getBrowseUrl(item)
@@ -303,7 +278,7 @@ abstract class BaseHelper(protected var authData: AuthData) {
         }
     }
 
-    fun getEditorChoiceBundles(item: Item): EditorChoiceBundle {
+    private fun getEditorChoiceBundles(item: Item): EditorChoiceBundle {
         val title = if (item.hasTitle()) item.title else String()
         val choiceClusters: MutableList<EditorChoiceCluster> = ArrayList()
         for (subItem in item.subItemList) {
@@ -319,19 +294,22 @@ abstract class BaseHelper(protected var authData: AuthData) {
 
     fun getEditorChoiceBundles(listResponse: ListResponse?): List<EditorChoiceBundle> {
         val editorChoiceBundles: MutableList<EditorChoiceBundle> = ArrayList()
-        if (listResponse != null && listResponse.itemCount > 0) {
-            val item = listResponse.getItem(0)
-            if (item != null) {
-                if (item.subItemCount > 0) {
-                    for (subItem in item.subItemList) {
-                        val bundle = getEditorChoiceBundles(subItem)
-                        if (bundle.bundleChoiceClusters.isNotEmpty()) {
-                            editorChoiceBundles.add(bundle)
+
+        listResponse?.let {
+            it.itemList.forEach {
+                it?.let {
+                    it.subItemList.forEach {
+                        it?.let {
+                            val bundle = getEditorChoiceBundles(it)
+                            if (bundle.bundleChoiceClusters.isNotEmpty()) {
+                                editorChoiceBundles.add(bundle)
+                            }
                         }
                     }
                 }
             }
         }
+
         return editorChoiceBundles
     }
 }

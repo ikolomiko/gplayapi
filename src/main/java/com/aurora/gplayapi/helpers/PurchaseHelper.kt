@@ -49,6 +49,11 @@ class PurchaseHelper(authData: AuthData) : BaseHelper(authData) {
             for (item in listResponse.itemList) {
                 for (subItem in item.subItemList) {
                     if (item.subItemCount > 0) {
+                        if (item.hasAnnotations()
+                            && item.annotations.hasPurchaseHistoryDetails()
+                            && item.annotations.purchaseHistoryDetails.hasPurchaseStatus()
+                        )
+                            continue
                         purchaseAppList.addAll(getAppsFromItem(subItem))
                     }
                 }

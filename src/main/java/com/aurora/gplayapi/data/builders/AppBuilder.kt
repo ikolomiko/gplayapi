@@ -84,6 +84,7 @@ object AppBuilder {
             app.instantAppLink = it
         }
 
+        parseEditorReasons(app, item)
         parseAppInfo(app, item)
         parseChips(app, item)
         parseDisplayBadges(app, item)
@@ -97,6 +98,14 @@ object AppBuilder {
         parseTestingProgram(app, appDetails)
 
         return app
+    }
+
+    private fun parseEditorReasons(app: App, item: Item) {
+        item.annotations?.let {
+            if (it.hasReasons()) {
+                app.editorReason = it.reasons
+            }
+        }
     }
 
     private fun parseDisplayBadges(app: App, item: Item) {
