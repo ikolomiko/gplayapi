@@ -23,6 +23,7 @@ import com.aurora.gplayapi.data.models.App
 import com.aurora.gplayapi.data.models.File
 import com.aurora.gplayapi.data.models.details.Badge
 import com.aurora.gplayapi.data.models.details.Chip
+import com.aurora.gplayapi.data.models.editor.EditorChoiceReason
 
 object AppBuilder {
 
@@ -103,7 +104,10 @@ object AppBuilder {
     private fun parseEditorReasons(app: App, item: Item) {
         item.annotations?.let {
             if (it.hasReasons()) {
-                app.editorReason = it.reasons
+                app.editorReason = EditorChoiceReason(
+                    it.reasons.bulletinList,
+                    it.reasons.description
+                )
             }
         }
     }

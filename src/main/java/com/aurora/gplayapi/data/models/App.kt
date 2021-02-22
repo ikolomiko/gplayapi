@@ -17,6 +17,7 @@ package com.aurora.gplayapi.data.models
 
 import com.aurora.gplayapi.Constants.Restriction
 import com.aurora.gplayapi.data.models.details.*
+import com.aurora.gplayapi.data.models.editor.EditorChoiceReason
 
 class App(var packageName: String) {
     var id: Int = 0
@@ -39,7 +40,7 @@ class App(var packageName: String) {
     var developerWebsite: String = String()
     var displayBadges: MutableList<Badge> = mutableListOf()
     var displayName: String = String()
-    var editorReason: String = String()
+    var editorReason: EditorChoiceReason? = null
     var downloadString: String = String()
     var earlyAccess = false
     var fileList: MutableList<File> = mutableListOf()

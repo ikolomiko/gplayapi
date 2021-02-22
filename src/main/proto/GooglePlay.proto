@@ -1205,7 +1205,7 @@ message Annotations {
   optional string downloadsLabel = 48;
   optional Badge badgeForRating = 50;
   optional CategoryInfo categoryInfo = 53;
-  optional string reasons = 60;
+  optional EditorReason reasons = 60;
   optional Stream topChartStream = 65;
   optional string categoryName = 66;
   repeated Chip chip = 71;
@@ -1215,6 +1215,11 @@ message Annotations {
   optional OverlayMetaData overlayMetaDataExtra = 91;
   optional SectionImage sectionImage = 94;
   optional SubStream categoryStream = 97;
+}
+
+message EditorReason {
+  repeated string bulletin = 1;
+  optional string description = 2;
 }
 
 message SectionMetaData {
