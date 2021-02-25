@@ -20,16 +20,20 @@ import com.aurora.gplayapi.data.models.details.TestingProgram
 
 object TestingProgramBuilder {
 
-    fun build(appDetails: AppDetails): TestingProgram {
-        return TestingProgram().apply {
-            appDetails.testingProgramInfo?.let {
-                artwork = ArtworkBuilder.build(it.image)
-                displayName = it.displayName
-                email = it.email
-                isAvailable = true
-                isSubscribed = it.subscribed
-                isSubscribedAndInstalled = it.subscribedAndInstalled
+    fun build(appDetails: AppDetails): TestingProgram? {
+        return if (appDetails.hasTestingProgramInfo()) {
+            TestingProgram().apply {
+                appDetails.testingProgramInfo?.let {
+                    artwork = ArtworkBuilder.build(it.image)
+                    displayName = it.displayName
+                    email = it.email
+                    isAvailable = true
+                    isSubscribed = it.subscribed
+                    isSubscribedAndInstalled = it.subscribedAndInstalled
+                }
             }
+        } else {
+            null
         }
     }
 }
