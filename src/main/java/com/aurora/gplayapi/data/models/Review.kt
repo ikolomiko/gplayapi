@@ -26,7 +26,7 @@ class Review {
     var timeStamp: Long = 0L
 
     override fun hashCode(): Int {
-        return userName.hashCode()
+        return commentId.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {

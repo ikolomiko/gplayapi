@@ -44,7 +44,24 @@ class ReviewsHelper(authData: AuthData) : BaseHelper(authData) {
     ): ReviewResponse? {
         val responseBody = getResponse(url, params, headers)
         val payload = getPayLoadFromBytes(responseBody.responseBytes)
-        return if (payload.hasReviewResponse()) payload.reviewResponse else null
+        return if (payload.hasReviewResponse())
+            payload.reviewResponse
+        else
+            null
+    }
+
+    @Throws(Exception::class)
+    private fun getReviewSummaryResponse(
+        url: String,
+        params: Map<String, String>,
+        headers: Map<String, String>
+    ): ReviewResponse? {
+        val responseBody = getResponse(url, params, headers)
+        val payload = getPayLoadFromBytes(responseBody.responseBytes)
+        return if (payload.hasReviewSummaryResponse())
+            payload.reviewSummaryResponse
+        else
+            null
     }
 
     @Throws(Exception::class)
@@ -89,6 +106,18 @@ class ReviewsHelper(authData: AuthData) : BaseHelper(authData) {
         val headers: MutableMap<String, String> = getDefaultHeaders(authData)
         val reviewResponse = getReviewResponse(GooglePlayApi.URL_REVIEWS, params, headers)
         return getReviewCluster(reviewResponse)
+    }
+
+    @Throws(Exception::class)
+    fun getReviewSummary(
+        packageName: String
+    ): List<Review> {
+        val params: MutableMap<String, String> = HashMap()
+        params["doc"] = packageName
+
+        val headers: MutableMap<String, String> = getDefaultHeaders(authData)
+        val reviewResponse = getReviewSummaryResponse("${GooglePlayApi.URL_FDFE}/reviewSummary", params, headers)
+        return getReviewCluster(reviewResponse).reviewList
     }
 
     @Throws(Exception::class)

@@ -1712,6 +1712,7 @@ message Payload {
   optional DocumentSharingStateResponse documentSharingStateResponse = 59;
   optional ModuleDeliveryResponse moduleDeliveryResponse = 70;
   optional TestingProgramResponse testingProgramResponse = 80;
+  optional ReviewResponse reviewSummaryResponse = 129;
 }
 
 message CheckIabPromoResponse {
