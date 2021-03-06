@@ -18,6 +18,7 @@ package com.aurora.gplayapi.data.models
 class Review {
     var title: String = String()
     var comment: String = String()
+    var commentId: String = String()
     var userName: String = String()
     var userPhotoUrl: String = String()
     var appVersion: String = String()
@@ -30,7 +31,7 @@ class Review {
 
     override fun equals(other: Any?): Boolean {
         return when (other) {
-            is Review -> other.userName == userName
+            is Review -> other.commentId == commentId
             else -> false
         }
     }

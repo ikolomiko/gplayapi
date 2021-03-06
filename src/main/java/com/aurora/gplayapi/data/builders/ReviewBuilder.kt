@@ -23,6 +23,7 @@ object ReviewBuilder {
     fun build(reviewProto: com.aurora.gplayapi.Review): Review {
         return Review().apply {
             comment = reviewProto.comment
+            commentId = reviewProto.commentId
             title = reviewProto.title
             rating = reviewProto.starRating
             userName = reviewProto.userProfile.name

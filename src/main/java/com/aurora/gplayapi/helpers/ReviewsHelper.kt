@@ -15,12 +15,12 @@
 
 package com.aurora.gplayapi.helpers
 
-import com.aurora.gplayapi.GetReviewsResponse
 import com.aurora.gplayapi.GooglePlayApi
 import com.aurora.gplayapi.ReviewResponse
-import com.aurora.gplayapi.data.builders.ReviewBuilder.build
+import com.aurora.gplayapi.data.builders.ReviewBuilder
 import com.aurora.gplayapi.data.models.AuthData
 import com.aurora.gplayapi.data.models.Review
+import com.aurora.gplayapi.data.models.ReviewCluster
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.network.IHttpClient
 import java.util.*
@@ -54,36 +54,41 @@ class ReviewsHelper(authData: AuthData) : BaseHelper(authData) {
         return if (payload.hasReviewResponse()) payload.reviewResponse else null
     }
 
-    private fun getUserReviewsResponse(reviewResponse: ReviewResponse?): GetReviewsResponse? {
-        return reviewResponse?.userReviewsResponse
+    private fun getReviewCluster(reviewResponse: ReviewResponse?): ReviewCluster {
+        val reviewCluster = ReviewCluster()
+        reviewResponse?.let {
+            val reviewList: MutableList<Review> = ArrayList()
+            for (reviewProto in it.userReviewsResponse.reviewList) {
+                reviewProto?.let { review ->
+                    reviewList.add(ReviewBuilder.build(review))
+                }
+            }
+            reviewCluster.reviewList.addAll(reviewList)
+            reviewCluster.nextPageUrl = it.nextPageUrl
+        }
+
+        return reviewCluster
     }
 
     @Throws(Exception::class)
     fun getReviews(
         packageName: String,
         filter: Review.Filter,
-        offset: Int = OFFSET,
         resultNum: Int = DEFAULT_SIZE
-    ): List<Review> {
+    ): ReviewCluster {
         val params: MutableMap<String, String> = HashMap()
         params["doc"] = packageName
-        params["o"] = offset.toString()
         params["n"] = resultNum.toString()
+
         when (filter) {
             Review.Filter.ALL -> params["sfilter"] = filter.value
             Review.Filter.POSITIVE, Review.Filter.CRITICAL -> params["sent"] = filter.value
             else -> params["rating"] = filter.value
         }
+
         val headers: MutableMap<String, String> = getDefaultHeaders(authData)
-        val reviewList: MutableList<Review> = ArrayList()
         val reviewResponse = getReviewResponse(GooglePlayApi.URL_REVIEWS, params, headers)
-        val userReviewsResponse = getUserReviewsResponse(reviewResponse)
-        if (userReviewsResponse != null) {
-            for (reviewProto in userReviewsResponse.reviewList) {
-                reviewList.add(build(reviewProto!!))
-            }
-        }
-        return reviewList
+        return getReviewCluster(reviewResponse)
     }
 
     @Throws(Exception::class)
@@ -93,13 +98,14 @@ class ReviewsHelper(authData: AuthData) : BaseHelper(authData) {
         params["itpr"] = if (testing) "true" else "false"
         val headers: MutableMap<String, String> = getDefaultHeaders(authData)
         val reviewResponse = getReviewResponse(GooglePlayApi.URL_REVIEWS, params, headers)
-        val userReviewsResponse = getUserReviewsResponse(reviewResponse)
-        if (userReviewsResponse != null) {
-            if (userReviewsResponse.reviewCount > 0) {
-                val review = userReviewsResponse.getReview(0)
-                return build(review)
+
+        reviewResponse?.let {
+            if (it.userReviewsResponse.reviewCount > 0) {
+                val review = it.userReviewsResponse.getReview(0)
+                return ReviewBuilder.build(review)
             }
         }
+
         return null
     }
 
@@ -115,17 +121,19 @@ class ReviewsHelper(authData: AuthData) : BaseHelper(authData) {
 
         val headers: MutableMap<String, String> = getDefaultHeaders(authData)
         val reviewResponse = postReviewResponse(params, headers)
-        if (reviewResponse != null) {
-            val reviewProto = reviewResponse.userReview
-            if (reviewProto != null) {
-                return build(reviewProto)
+
+        reviewResponse?.let {
+            it.userReview?.let { review ->
+                return ReviewBuilder.build(review)
             }
         }
+
         return null
     }
 
-    @Throws(Exception::class)
-    fun next(packageName: String, filter: Review.Filter): List<Review> {
-        return getReviews(packageName, filter, ++OFFSET * DEFAULT_SIZE, DEFAULT_SIZE)
+    fun next(nextPageUrl: String): ReviewCluster {
+        val headers: MutableMap<String, String> = getDefaultHeaders(authData)
+        val reviewResponse = getReviewResponse("${GooglePlayApi.URL_FDFE}/${nextPageUrl}", mapOf(), headers)
+        return getReviewCluster(reviewResponse)
     }
 }
