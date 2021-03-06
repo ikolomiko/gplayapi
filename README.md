@@ -38,54 +38,47 @@ Use one of the following tools
 
 ### Fetch App Details
 
-    val app = AppDetailsHelper
-    .with(authData)
-    .getAppByPackageName(packageName)
+    val app = AppDetailsHelper(authData).getAppByPackageName(packageName)
 
-### Fetch Bulk App Details (Max 20)
+### Fetch Bulk App Details
 
-    val appList = AppDetailsHelper
-    .with(authData)
-    .getAppByPackageName(packageNameList)
+    val appList = AppDetailsHelper.getAppByPackageName(packageNameList)
 
 ### Fetch APKs/OBBs/Patches
 
-    val files = PurchaseHelper
-    .with(authData)
-    .purchase(app.packageName,app.versionCode,app.offerType)
+    val files = PurchaseHelper(authData).purchase(
+        app.packageName,
+        app.versionCode,
+        app.offerType
+    )
 
 ### Fetch All Categories
 
-    val categoryList = CategoryHelper
-    .with(authData)
-    .getAllCategoriesList(type) //type = GAME or APPLICATION
+    val categoryList = CategoryHelper(authData).getAllCategoriesList(type) //type = GAME or APPLICATION
 
 ### Fetch Search Suggestions
 
-    val entries = SearchHelper
-    .with(authData)
-    .searchSuggestions(query)
+    val entries = SearchHelper(authData).searchSuggestions(query)
 
 ### Search Apps & Games
 
-    var helper = SearchHelper.with(authData)
+    var helper = SearchHelper(authData)
     var searchBundle = helper.searchResults(query) 
     var appList = searchBundle.appList 
-	while (true) { 
-	    appList = helper.next(searchBundle.subBundles)  
-	}
+	
+    #To fetch next list 
+    appList = helper.next(searchBundle.subBundles)
 
 ### App Reviews
 
-    var helper = ReviewsHelper.with(authData)
-    var reviews: List<Review?> = helper.getReviews(packageName, filter) //filter = ALL, POSITIVE, CRITICAL
-    while (reviews.size >= ReviewsHelper.DEFAULT_SIZE) {
-        reviews = helper.next(packageName, filter)
-    }
+    var helper = ReviewsHelper(authData)
+    var reviewCluster = helper.getReviews(packageName, filter) //filter = ALL, POSITIVE, CRITICAL
+    #To fetch next list    
+    reviewCluster = helper.next(reviewCluster.nextPageUrl)
 
 ### User Reviews
 
-    var helper = ReviewsHelper.with(authData)
+    var helper = ReviewsHelper(authData)
     //Submit or Edit review
     val review = helper.addOrEditReview(packageName, title, content, rating, isBeta)
     //Retrive review
