@@ -27,6 +27,12 @@ class AuthData {
         this.aasToken = aasToken
     }
 
+    constructor(email: String, authToken: String, insecure : Boolean = true) {
+        this.email = email
+        this.authToken = authToken
+        this.isAnonymous = true
+    }
+
     var email: String = String()
     var aasToken: String = String()
     var isAnonymous: Boolean = false

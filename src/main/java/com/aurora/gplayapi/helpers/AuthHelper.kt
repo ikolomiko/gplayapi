@@ -57,10 +57,10 @@ class AuthHelper private constructor() {
             authData.locale = Locale.getDefault()
 
             val api = GooglePlayApi(authData).via(httpClient)
-            val gsfId = api.generateGsfId()
+            val gsfId = api.generateGsfId(deviceInfoProvider)
             authData.gsfId = gsfId
 
-            val deviceConfigResponse = api.uploadDeviceConfig()
+            val deviceConfigResponse = api.uploadDeviceConfig(deviceInfoProvider)
             authData.deviceConfigToken = deviceConfigResponse.uploadDeviceConfigToken
 
             val ac2dm = api.generateToken(aasToken, GooglePlayApi.Service.AC2DM)
@@ -72,6 +72,37 @@ class AuthHelper private constructor() {
             val token = api.generateToken(aasToken, GooglePlayApi.Service.GOOGLE_PLAY)
             authData.authToken = token
 
+            val tosResponse = api.toc()
+
+            //Fetch UserProfile
+            authData.userProfile = UserProfileHelper(authData).getUserProfile()
+
+            return authData
+        }
+
+        fun buildInsecure(
+            email: String,
+            authToken: String,
+            locale: Locale,
+            deviceInfoProvider: DeviceInfoProvider
+        ): AuthData {
+
+            val authData = AuthData(email, authToken, true)
+
+            authData.deviceInfoProvider = deviceInfoProvider
+            authData.locale = locale
+
+            val api = GooglePlayApi(authData)
+
+            //Android GSF ID
+            val gsfId = api.generateGsfId(deviceInfoProvider)
+            authData.gsfId = gsfId
+
+            //Upload Device Config
+            val deviceConfigResponse = api.uploadDeviceConfig(deviceInfoProvider)
+            authData.deviceConfigToken = deviceConfigResponse.uploadDeviceConfigToken
+
+            //GooglePlay TOS
             val tosResponse = api.toc()
 
             //Fetch UserProfile

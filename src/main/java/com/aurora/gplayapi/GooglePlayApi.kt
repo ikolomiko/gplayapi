@@ -17,6 +17,7 @@ package com.aurora.gplayapi
 
 import com.aurora.gplayapi.GooglePlayApi.Service.*
 import com.aurora.gplayapi.data.models.AuthData
+import com.aurora.gplayapi.data.providers.DeviceInfoProvider
 import com.aurora.gplayapi.data.providers.HeaderProvider.getAuthHeaders
 import com.aurora.gplayapi.data.providers.HeaderProvider.getDefaultHeaders
 import com.aurora.gplayapi.data.providers.ParamProvider.getAASTokenParams
@@ -65,9 +66,9 @@ class GooglePlayApi(private val authData: AuthData) {
     }
 
     @Throws(IOException::class)
-    fun uploadDeviceConfig(): UploadDeviceConfigResponse {
+    fun uploadDeviceConfig(deviceInfoProvider: DeviceInfoProvider): UploadDeviceConfigResponse {
         val request = UploadDeviceConfigRequest.newBuilder()
-            .setDeviceConfiguration(authData.deviceInfoProvider!!.deviceConfigurationProto)
+            .setDeviceConfiguration(deviceInfoProvider.deviceConfigurationProto)
             .build()
 
         val headers: MutableMap<String, String> = getDefaultHeaders(authData)
@@ -86,8 +87,8 @@ class GooglePlayApi(private val authData: AuthData) {
     }
 
     @Throws(IOException::class)
-    fun generateGsfId(): String {
-        val request = authData.deviceInfoProvider?.generateAndroidCheckInRequest()
+    fun generateGsfId(deviceInfoProvider: DeviceInfoProvider): String {
+        val request = deviceInfoProvider.generateAndroidCheckInRequest()
         val checkInResponse = checkIn(request!!.toByteArray())
         val gsfId = BigInteger.valueOf(checkInResponse.androidId).toString(16)
         authData.gsfId = gsfId
