@@ -24,6 +24,9 @@ import com.aurora.gplayapi.data.models.File
 import com.aurora.gplayapi.data.models.details.Badge
 import com.aurora.gplayapi.data.models.details.Chip
 import com.aurora.gplayapi.data.models.editor.EditorChoiceReason
+import com.aurora.gplayapi.utils.Util
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 object AppBuilder {
 
@@ -63,7 +66,7 @@ object AppBuilder {
         app.versionCode = appDetails.versionCode
         app.categoryName = appDetails.categoryName
         app.size = appDetails.infoDownloadSize
-        app.installs = appDetails.downloadCount
+        app.installs = getInstalls(appDetails.infoDownload)
         app.downloadString = appDetails.downloadLabelAbbreviated
         app.changes = appDetails.recentChangesHtml
         app.permissions = appDetails.permissionList
@@ -246,5 +249,10 @@ object AppBuilder {
                 }
             )
         }
+    }
+
+    private fun getInstalls(downloadInfo: String): Long {
+        val matcher: Matcher = Pattern.compile("[\\d]+").matcher(downloadInfo.replace("[,.\\s]+".toRegex(), ""))
+        return if (matcher.find()) Util.parseLong(matcher.group(0), 0) else 0
     }
 }

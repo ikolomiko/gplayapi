@@ -32,4 +32,12 @@ public class Util {
         }
         return keyValueMap;
     }
+
+    public static long parseLong(String intAsString, long defaultValue) {
+        try {
+            return Long.parseLong(intAsString);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
 }
