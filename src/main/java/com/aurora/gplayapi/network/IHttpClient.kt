@@ -17,6 +17,7 @@ package com.aurora.gplayapi.network
 
 import com.aurora.gplayapi.data.models.PlayResponse
 import java.io.IOException
+import java.net.Proxy
 
 interface IHttpClient {
     @Throws(IOException::class)
@@ -39,4 +40,7 @@ interface IHttpClient {
 
     @Throws(IOException::class)
     fun postAuth(url: String, body: ByteArray): PlayResponse
+
+    @Throws(UnsupportedOperationException::class)
+    fun setProxy(proxy: Proxy, proxyUser: String?, proxyPassword: String?)
 }
