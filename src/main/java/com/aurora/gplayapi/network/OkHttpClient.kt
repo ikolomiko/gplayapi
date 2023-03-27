@@ -1,28 +1,21 @@
 /*
- * Aurora Store
- *  Copyright (C) 2021, Rahul Kumar Patel <whyorean@gmail.com>
+ *     GPlayApi
+ *     Copyright (C) 2023  Aurora OSS
  *
- *  Aurora Store is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- *  Aurora Store is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Aurora Store.  If not, see <http://www.gnu.org/licenses/>.
- *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
  */
 
-package com.aurora.store.data.network
+package com.aurora.gplayapi.network
 
 import com.aurora.gplayapi.data.models.PlayResponse
-import com.aurora.gplayapi.network.IHttpClient
-import com.aurora.store.BuildConfig
-import com.aurora.store.util.Log
 import okhttp3.*
 import okhttp3.Headers.Companion.toHeaders
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -37,22 +30,25 @@ object OkHttpClient : IHttpClient {
     private const val POST = "POST"
     private const val GET = "GET"
 
-    private val okHttpClient = OkHttpClient().newBuilder()
-        .connectTimeout(25, TimeUnit.SECONDS)
-        .readTimeout(25, TimeUnit.SECONDS)
-        .writeTimeout(25, TimeUnit.SECONDS)
-        .retryOnConnectionFailure(true)
-        .followRedirects(true)
-        .followSslRedirects(true)
-        .build()
+    private val okHttpClient =
+        OkHttpClient()
+            .newBuilder()
+            .connectTimeout(25, TimeUnit.SECONDS)
+            .readTimeout(25, TimeUnit.SECONDS)
+            .writeTimeout(25, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
+            .followRedirects(true)
+            .followSslRedirects(true)
+            .build()
 
     @Throws(IOException::class)
     fun post(url: String, headers: Map<String, String>, requestBody: RequestBody): PlayResponse {
-        val request = Request.Builder()
-            .url(url)
-            .headers(headers.toHeaders())
-            .method(POST, requestBody)
-            .build()
+        val request =
+            Request.Builder()
+                .url(url)
+                .headers(headers.toHeaders())
+                .method(POST, requestBody)
+                .build()
         return processRequest(request)
     }
 
@@ -62,34 +58,25 @@ object OkHttpClient : IHttpClient {
         headers: Map<String, String>,
         params: Map<String, String>,
     ): PlayResponse {
-        val request = Request.Builder()
-            .url(buildUrl(url, params))
-            .headers(headers.toHeaders())
-            .method(POST, "".toRequestBody(null))
-            .build()
+        val request =
+            Request.Builder()
+                .url(buildUrl(url, params))
+                .headers(headers.toHeaders())
+                .method(POST, "".toRequestBody(null))
+                .build()
         return processRequest(request)
     }
 
     override fun postAuth(url: String, body: ByteArray): PlayResponse {
-        val requestBody = body.toRequestBody("application/json".toMediaType(), 0, body.size)
-        val request = Request.Builder()
-            .url(url)
-            .header(
-                "User-Agent",
-                "${BuildConfig.APPLICATION_ID}-${BuildConfig.VERSION_NAME}-${BuildConfig.VERSION_CODE}",
-            )
-            .method(POST, requestBody)
-            .build()
-        return processRequest(request)
+        return PlayResponse().apply {
+            isSuccessful = false
+            code = 444
+        }
     }
 
     @Throws(IOException::class)
     override fun post(url: String, headers: Map<String, String>, body: ByteArray): PlayResponse {
-        val requestBody = body.toRequestBody(
-            "application/x-protobuf".toMediaType(),
-            0,
-            body.size,
-        )
+        val requestBody = body.toRequestBody("application/x-protobuf".toMediaType(), 0, body.size)
         return post(url, headers, requestBody)
     }
 
@@ -104,37 +91,30 @@ object OkHttpClient : IHttpClient {
         headers: Map<String, String>,
         params: Map<String, String>,
     ): PlayResponse {
-        val request = Request.Builder()
-            .url(buildUrl(url, params))
-            .headers(headers.toHeaders())
-            .method(GET, null)
-            .build()
+        val request =
+            Request.Builder()
+                .url(buildUrl(url, params))
+                .headers(headers.toHeaders())
+                .method(GET, null)
+                .build()
         return processRequest(request)
     }
 
     override fun getAuth(url: String): PlayResponse {
-        val request = Request.Builder()
-            .url(url)
-            .header(
-                "User-Agent",
-                "${BuildConfig.APPLICATION_ID}-${BuildConfig.VERSION_NAME}-${BuildConfig.VERSION_CODE}",
-            )
-            .method(GET, null)
-            .build()
-        return processRequest(request)
+        return PlayResponse().apply {
+            isSuccessful = false
+            code = 444
+        }
     }
 
     @Throws(IOException::class)
-    override fun get(
-        url: String,
-        headers: Map<String, String>,
-        paramString: String,
-    ): PlayResponse {
-        val request = Request.Builder()
-            .url(url + paramString)
-            .headers(headers.toHeaders())
-            .method(GET, null)
-            .build()
+    override fun get(url: String, headers: Map<String, String>, paramString: String): PlayResponse {
+        val request =
+            Request.Builder()
+                .url(url + paramString)
+                .headers(headers.toHeaders())
+                .method(GET, null)
+                .build()
         return processRequest(request)
     }
 
@@ -145,9 +125,7 @@ object OkHttpClient : IHttpClient {
 
     private fun buildUrl(url: String, params: Map<String, String>): HttpUrl {
         val urlBuilder = url.toHttpUrl().newBuilder()
-        params.forEach {
-            urlBuilder.addQueryParameter(it.key, it.value)
-        }
+        params.forEach { urlBuilder.addQueryParameter(it.key, it.value) }
         return urlBuilder.build()
     }
 
@@ -163,8 +141,6 @@ object OkHttpClient : IHttpClient {
             if (!isSuccessful) {
                 errorString = response.message
             }
-        }.also {
-            Log.i("OKHTTP [${response.code}] ${response.request.url}")
         }
     }
 }
