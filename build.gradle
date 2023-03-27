@@ -44,6 +44,9 @@ dependencies {
     //Fuel
     implementation("com.github.kittinunf.fuel:fuel:2.3.0")
 
+    // OkHttp3
+    implementation "com.squareup.okhttp3:okhttp:4.9.3"
+
     //Gson
     implementation 'com.google.code.gson:gson:2.8.6'
 }
