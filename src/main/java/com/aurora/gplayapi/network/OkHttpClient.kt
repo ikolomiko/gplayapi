@@ -42,7 +42,7 @@ object OkHttpClient : IHttpClient {
             .followSslRedirects(true)
             .build()
 
-    fun setProxy(proxy: Proxy, proxyAuthenticator: Authenticator?) {
+    override fun setProxy(proxy: Proxy, proxyUser: String?, proxyPassword: String?) {
         var clientBuilder =
             OkHttpClient()
                 .newBuilder()
@@ -54,7 +54,19 @@ object OkHttpClient : IHttpClient {
                 .followSslRedirects(true)
                 .proxy(proxy)
 
-        if (proxyAuthenticator != null) {
+        if (proxyUser != null) {
+            val proxyAuthenticator =
+                object : Authenticator {
+                    @Throws(IOException::class)
+                    override fun authenticate(route: Route?, response: Response): Request? {
+                        val credential = Credentials.basic(proxyUser, proxyPassword.orEmpty())
+                        return response.request
+                            .newBuilder()
+                            .header("Proxy-Authorization", credential)
+                            .build()
+                    }
+                }
+
             clientBuilder = clientBuilder.proxyAuthenticator(proxyAuthenticator)
         }
 
