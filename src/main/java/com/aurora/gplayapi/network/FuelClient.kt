@@ -18,9 +18,15 @@ package com.aurora.gplayapi.network
 import com.aurora.gplayapi.data.models.PlayResponse
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.*
+import java.net.Proxy
 import java.nio.charset.Charset
 
 object FuelClient : IHttpClient {
+
+    @Throws(UnsupportedOperationException::class)
+    override fun setProxy(proxy: Proxy, proxyUser: String?, proxyPassword: String?) {
+        throw UnsupportedOperationException("Proxies on Fuel http are not supported (yet)")
+    }
 
     override fun get(url: String, headers: Map<String, String>): PlayResponse {
         return get(url, headers, hashMapOf())
