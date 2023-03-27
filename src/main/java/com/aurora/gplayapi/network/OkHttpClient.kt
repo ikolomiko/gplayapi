@@ -23,6 +23,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
+import java.net.Proxy
 import java.util.concurrent.TimeUnit
 
 object OkHttpClient : IHttpClient {
@@ -30,7 +31,7 @@ object OkHttpClient : IHttpClient {
     private const val POST = "POST"
     private const val GET = "GET"
 
-    private val okHttpClient =
+    private var okHttpClient =
         OkHttpClient()
             .newBuilder()
             .connectTimeout(25, TimeUnit.SECONDS)
@@ -40,6 +41,25 @@ object OkHttpClient : IHttpClient {
             .followRedirects(true)
             .followSslRedirects(true)
             .build()
+
+    fun setProxy(proxy: Proxy, proxyAuthenticator: Authenticator?) {
+        var clientBuilder =
+            OkHttpClient()
+                .newBuilder()
+                .connectTimeout(25, TimeUnit.SECONDS)
+                .readTimeout(25, TimeUnit.SECONDS)
+                .writeTimeout(25, TimeUnit.SECONDS)
+                .retryOnConnectionFailure(true)
+                .followRedirects(true)
+                .followSslRedirects(true)
+                .proxy(proxy)
+
+        if (proxyAuthenticator != null) {
+            clientBuilder = clientBuilder.proxyAuthenticator(proxyAuthenticator)
+        }
+
+        okHttpClient = clientBuilder.build()
+    }
 
     @Throws(IOException::class)
     fun post(url: String, headers: Map<String, String>, requestBody: RequestBody): PlayResponse {
